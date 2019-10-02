@@ -1,0 +1,15 @@
+Sekvenssikaavio tapahtumasarjasta, kun mennään Notes-applikaation
+SPA -versioon 
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa
+
+palvelin-->selain: spa.html
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+
+palvelin-->selain: main.css
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa.js
+
+palvelin-->selain: spa.js
+
