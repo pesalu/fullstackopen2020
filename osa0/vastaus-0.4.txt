@@ -1,0 +1,21 @@
+Sekvenssikaavio tapahtumasarjasta, kun luodaan uusi muistiinpano:
+
+
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/notes/new_note
+palvelin-->selain: HTTP 302 redirect to /notes
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+palvelin-->selain: HTML-koodi
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+palvelin-->selain: main.css
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+palvelin-->selain: main.js
+
+note over selain:
+main.js tiedoston sisältämän
+js-koodin suoritus, joka 
+sisältää uuden pyynnön palvelimelle
+end note 
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+palvelin-->selain: data.json
