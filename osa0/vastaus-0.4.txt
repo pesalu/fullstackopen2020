@@ -19,3 +19,9 @@ end note
 
 selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
 palvelin-->selain: data.json
+
+note over selain:
+Datan saapuessa selain suorittaa tapahtumankäsittelijän 
+sisältämän metodin koodin, joka renderöi selaimen DOM-apia
+hyväksikäyttäen datan näkyviin sivulle.
+end note 
