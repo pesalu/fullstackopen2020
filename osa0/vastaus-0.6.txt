@@ -1,0 +1,27 @@
+Sekvenssikaavio tapahtumasarjasta, kun luodaan uusi muistiinpano
+SPA-versiossa
+
+note over selain:
+Selaimen javascript koodissa
+lisätään muistiinpanojen listaan 
+uusi muistiinpano, ja 
+renderöidän sivun näkymä.
+end note
+
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+
+palvelin-->selain: HTTP 201 Created
+
+
+
+
+
+
+
+
+
+
+
+
+
+
