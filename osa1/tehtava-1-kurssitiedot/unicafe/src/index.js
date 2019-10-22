@@ -12,7 +12,37 @@ const Header = (props) => {
 
 const Button = ({onClick, text}) => (
     <button onClick={onClick} >{text}</button>
-  )
+  );
+
+const Statistic = ({variableName, value}) => (<div>{variableName}: {value}</div>);
+
+const Statistics = ({good, neutral, bad}) => {
+  const all = () => good + neutral + bad;
+
+  const average = () => {
+    if (all() === 0) return 0;
+    return (good - 1*bad) / (good + neutral + bad);
+  }
+
+  const positive = () => {
+    if (all() === 0) return 0;
+    return good / all();
+  }
+
+  if (all() === 0) return (<><Header name='Statistics'></Header><div>No feedback given!</div></>);
+
+  return (
+    <>
+    <Header name='Statistics'></Header>
+    <Statistic variableName='Good' value={good}></Statistic>
+    <Statistic variableName='Neutral' value={neutral}></Statistic>
+    <Statistic variableName='Bad' value={bad}></Statistic>
+    <Statistic variableName='All' value={all()}></Statistic>
+    <Statistic variableName='Average' value={average()}></Statistic>
+    <Statistic variableName='Positive' value={positive()}></Statistic>
+    </>
+  );
+}
 
 const App = () => {
   const title = 'Unicafe palaute'
@@ -35,10 +65,7 @@ const App = () => {
       </span>
       <br/>
       <br/>
-      <Header name='Statistics' />
-      <div>Good: {good}</div>
-      <div>Neutral: {neutral}</div>
-      <div>Bad: {bad}</div>
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
