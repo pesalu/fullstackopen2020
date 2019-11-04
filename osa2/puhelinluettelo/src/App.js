@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
+import personService from './service/person-service'
 
 // //
 // Riittää että erotat sovelluksesta kolme komponenttia. Hyviä kandidaatteja ovat esim. filtteröintilomake, uuden henkilön lisäävä lomake, kaikki henkilöt renderöivä komponentti sekä yksittäisen henkilön renderöivä komponentti.
@@ -16,12 +15,17 @@ const Filter = ({searchTextChangeHandler, newSearchQuery}) => {
     )
 }
 
-const Persons = ({persons}) => {
-    return persons.map((person) => <Person key={person.id} name={person.name} phone={person.number}></Person>);
+const Persons = ({persons, removePerson}) => {
+  return persons.map((person) => 
+    <Person key={person.id} 
+            name={person.name} 
+            phone={person.number} 
+            removePerson={() => removePerson(person.id)}
+    />);
 }
 
-const Person = ({name, phone}) => {
-    return (<div>{name} {phone}</div>)
+const Person = ({name, phone, removePerson}) => {
+    return (<div>{name} {phone} <button onClick={removePerson}>Poista</button></div>)
 }
 
 const PersonForm = ({submissionHandler, handleNameChange, handlePhoneNumberChanges, newName, newPhoneNumber}) => {
@@ -50,10 +54,8 @@ const App = () => {
   const [ newSearchQueryText, setNewSearchQueryText ] = useState('');
 
   const hook = () => {
-    axios.get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data);
-      })
+    personService.getPersons()
+        .then(persons => setPersons(persons))
   }
   useEffect(hook, []);
 
@@ -61,24 +63,43 @@ const App = () => {
     if (!newSearchQueryText) return persons;
     return persons.filter(person => person.name.toLowerCase().includes(newSearchQueryText) || person.number.toLowerCase().includes(newSearchQueryText));
   }
+
   const addPerson = (event) => {
-    event.preventDefault();
-
-    if (persons.find(person => person.name === newName)) {
-        window.alert(`${newName} is already added to phonebook!`);
-        return;
-    }
-
+    event.preventDefault(); 
+    
     let newPerson = {
         name: newName,
         number: newPhoneNumber,
-        id: persons.length + 1,
     };
 
-    setPersons(persons.concat(newPerson));
-    setNewName('');
-    setNewPhoneNumber('');
+    let existingPerson = persons.find(person => person.name === newName);
+    if (existingPerson) {
+      if (window.confirm('Haluatko muuttaa puhelinnumeron?')) {
+        personService.updatePerson(existingPerson.id, {...existingPerson, number: newPhoneNumber})
+          .then(updatedPerson => {
+              setPersons( persons.map( person => person.id !== updatedPerson.id ? person : updatedPerson ) );
+              setNewName('');
+              setNewPhoneNumber('');
+          });
+      }
+    } else {
+      personService.addPerson(newPerson)
+        .then(person => {
+            setPersons(persons.concat(person));
+            setNewName('');
+            setNewPhoneNumber('');
+        })
+    }
+
   };
+
+  const removePerson = (personId) => {
+    if (window.confirm('Haluatko varmasti poistaa?')) {
+      personService.deletePerson(personId)
+        .then( response => setPersons( persons.filter( person => person.id !== personId ) )
+      )
+    }
+  }
 
   const handleNameChange = (event) => setNewName(event.target.value);
   const handlePhoneNumberChanges = (event) => setNewPhoneNumber(event.target.value);
@@ -97,7 +118,7 @@ const App = () => {
                     newPhoneNumber={newPhoneNumber}>
         </PersonForm>
         <h2>Persons</h2>
-        <Persons persons={filteredPersonList(persons)}></Persons>
+        <Persons persons={filteredPersonList(persons)} removePerson={removePerson}></Persons>
     </div>
   )
 
