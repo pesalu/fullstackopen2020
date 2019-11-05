@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import personService from './service/person-service'
-
+import './index.css'
 // //
 // Riittää että erotat sovelluksesta kolme komponenttia. Hyviä kandidaatteja ovat esim. filtteröintilomake, uuden henkilön lisäävä lomake, kaikki henkilöt renderöivä komponentti sekä yksittäisen henkilön renderöivä komponentti.
 
 // Sovelluksen juurikomponentti voi näyttää refaktoroinnin jälkeen suunnilleen seuraavalta, eli se ei itse renderöi suoraan oikeastaan mitään muita kuin otsikkoja:
 
+const Message = ({message, style}) => {
+  if (message === null || message === 'something happened...') return null;
+  if (style === null) style = 'message';
+
+  return (<div className={style}>{message}</div>)
+}
 
 const Filter = ({searchTextChangeHandler, newSearchQuery}) => {
     return (
@@ -52,6 +58,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('');
   const [ newPhoneNumber, setNewPhoneNumber ] = useState('');
   const [ newSearchQueryText, setNewSearchQueryText ] = useState('');
+  const [ errorMessage, setErrorMessage ] = useState(null);
+  const [ newMessage, setMessage ] = useState(null);
 
   const hook = () => {
     personService.getPersons()
@@ -66,7 +74,7 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault(); 
-    
+
     let newPerson = {
         name: newName,
         number: newPhoneNumber,
@@ -75,19 +83,29 @@ const App = () => {
     let existingPerson = persons.find(person => person.name === newName);
     if (existingPerson) {
       if (window.confirm('Haluatko muuttaa puhelinnumeron?')) {
-        personService.updatePerson(existingPerson.id, {...existingPerson, number: newPhoneNumber})
+        personService
+          .updatePerson(existingPerson.id, {...existingPerson, number: newPhoneNumber})
           .then(updatedPerson => {
               setPersons( persons.map( person => person.id !== updatedPerson.id ? person : updatedPerson ) );
               setNewName('');
               setNewPhoneNumber('');
+              setMessage('Person updated!');
+              setTimeout(() => setMessage(null), 5000);
+          })
+          .catch(error => {
+            setErrorMessage('Updating person ' + newPerson.name + ' failed. Person is already removed.' );
+            setTimeout(() => setErrorMessage(null), 5000);
           });
       }
     } else {
       personService.addPerson(newPerson)
         .then(person => {
-            setPersons(persons.concat(person));
-            setNewName('');
-            setNewPhoneNumber('');
+          console.log('+++++++')
+          setPersons(persons.concat(person));
+          setNewName('');
+          setNewPhoneNumber('');
+          setMessage( 'Person added!' );
+          setTimeout(() => setMessage(null), 5000);
         })
     }
 
@@ -96,8 +114,11 @@ const App = () => {
   const removePerson = (personId) => {
     if (window.confirm('Haluatko varmasti poistaa?')) {
       personService.deletePerson(personId)
-        .then( response => setPersons( persons.filter( person => person.id !== personId ) )
-      )
+        .then( response => {
+          setPersons( persons.filter( person => person.id !== personId ) )
+          setMessage( 'Person removed!' );
+          setTimeout(() => setMessage(null), 5000);
+        } )
     }
   }
 
@@ -108,6 +129,8 @@ const App = () => {
   return (
     <div>
         <h1>Phonebook</h1>
+        <Message message={errorMessage} style='error-message' />
+        <Message message={newMessage}  style='message' />
         <h2>Search by name or number</h2>
         <Filter searchTextChangeHandler={searchTextChangeHandler} newSearchQuery={newSearchQueryText}></Filter>
         <h2>Add new person</h2>
