@@ -4,9 +4,8 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 
 app.use(bodyParser.json());
-app.use(morgan('tiny'));
 
-morgan.token('person', (req, res) => JSON.stringify(req.body) )
+morgan.token('showPayload', (req, res) => { if (!isEmpty(req.body)) {return JSON.stringify(req.body)} });
 app.use(morgan((tokens, req, res) => {
   return [
     tokens.method(req, res),
@@ -14,9 +13,17 @@ app.use(morgan((tokens, req, res) => {
     tokens.status(req, res),
     tokens.res(req, res, 'content-length'), '-',
     tokens['response-time'](req, res), 'ms',
-    tokens.person(req, res)
+    tokens.showPayload(req, res)
   ].join(' ');
 }));
+
+function isEmpty(obj) {
+  for(var key in obj) {
+      if(obj.hasOwnProperty(key))
+          return false;
+  }
+  return true;
+}
 
 let persons =  [
     {
