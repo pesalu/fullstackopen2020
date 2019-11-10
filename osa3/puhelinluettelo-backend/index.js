@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
+
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -16,6 +19,7 @@ app.use(morgan((tokens, req, res) => {
     tokens.showPayload(req, res)
   ].join(' ');
 }));
+
 
 function isEmpty(obj) {
   for(var key in obj) {
@@ -107,7 +111,7 @@ const generateId = () => {
 
 app.delete( baseUrl + '/persons/:id', (req, res) => {
   const id = Number(req.params.id);
-  if (!persons.find(person => person.id === id)) { 
+  if (!persons.find(person => person.id === id)) {
     res.status(404).end();
   } else {
     persons = persons.filter(person => person.id !== id);
@@ -115,7 +119,8 @@ app.delete( baseUrl + '/persons/:id', (req, res) => {
   }
 });
 
-const PORT = 3001
+// const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
