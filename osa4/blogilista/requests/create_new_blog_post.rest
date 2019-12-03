@@ -1,0 +1,9 @@
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Refactoring java code",
+  "author": "Petri L.",
+  "url": "becomefullstack.com",
+  "likes": 1
+}
