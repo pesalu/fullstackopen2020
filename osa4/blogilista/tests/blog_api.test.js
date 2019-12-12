@@ -13,7 +13,7 @@ const initialBlogs = [
     'likes': 1
   },
   {
-    'title': 'Antti Kaiross',
+    'title': 'Antti Kairossa',
     'author': 'Pekka Puurtimo Jr.',
     'url': 'aksu.net',
     'likes': 2
@@ -70,6 +70,26 @@ test('a valid blog can be added ', async () => {
   expect(blogTitles).toContain(
     'Liisa Karjalassa'
   );
+});
+
+test('set the value of \'likes\' in a blog to zero by default', async () => {
+  const testBlogWithUndefinedLikes = {
+    'title': 'Mathematics vol. 1',
+    'author': 'Kari Kielonen',
+    'url': '',
+    'likes': undefined
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(testBlogWithUndefinedLikes)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const response = await api.get('/api/blogs');
+  const addedBlog = response.body.find(blog => blog.title === 'Mathematics vol. 1');
+  console.log('addedBlog ', addedBlog);
+  expect(addedBlog.likes).toBe(0);
 });
 
 afterAll(() => {
