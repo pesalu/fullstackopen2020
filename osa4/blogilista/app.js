@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const config = require('./utils/config');
 const cors = require('cors');
 const bodyParser = require('body-parser')
-const notesRouter = require('./controllers/blogs');
+const blogRouter = require('./controllers/blogs');
+const middleware = require('./utils/middleware');
 
 const app = express();
 
@@ -12,6 +13,8 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true });
 app.use(cors());
 app.use(express.static('build'));
 app.use(bodyParser.json());
-app.use('/api/blogs', notesRouter);
+app.use('/api/blogs', blogRouter);
 
+// Middlwares
+app.use(middleware.errorHandler);
 module.exports = app;

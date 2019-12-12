@@ -9,7 +9,7 @@ notesRouter.get('/', (request, response) => {
     })
 })
 
-notesRouter.post('/', (request, response) => {
+notesRouter.post('/', (request, response, next) => {
   const blog = new Blog(request.body);
 
   blog
@@ -17,6 +17,7 @@ notesRouter.post('/', (request, response) => {
     .then(result => {
       response.status(201).json(result)
     })
+    .catch(error => next(error));
 });
 
 module.exports = notesRouter;

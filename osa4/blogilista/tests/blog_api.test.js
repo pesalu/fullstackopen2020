@@ -52,7 +52,7 @@ test('a valid blog can be added ', async () => {
   const testBlog = {
     'title': 'Liisa Karjalassa',
     'author': 'Pekka von Puurtimo',
-    'url': '',
+    'url': 'test.fi/1',
     'likes': 0
   };
 
@@ -76,7 +76,7 @@ test('set the value of \'likes\' in a blog to zero by default', async () => {
   const testBlogWithUndefinedLikes = {
     'title': 'Mathematics vol. 1',
     'author': 'Kari Kielonen',
-    'url': '',
+    'url': 'booky.com',
     'likes': undefined
   };
 
@@ -90,6 +90,20 @@ test('set the value of \'likes\' in a blog to zero by default', async () => {
   const addedBlog = response.body.find(blog => blog.title === 'Mathematics vol. 1');
   console.log('addedBlog ', addedBlog);
   expect(addedBlog.likes).toBe(0);
+});
+
+test('adding blog without title and url fails', async () =>  {
+  const testBlogWithUndefinedLikes = {
+    'title': undefined,
+    'author': 'Kari Kielonen',
+    'url': undefined,
+    'likes': undefined
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(testBlogWithUndefinedLikes)
+    .expect(400);
 });
 
 afterAll(() => {
