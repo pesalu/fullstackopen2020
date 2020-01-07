@@ -88,7 +88,6 @@ test('set the value of \'likes\' in a blog to zero by default', async () => {
 
   const response = await api.get('/api/blogs');
   const addedBlog = response.body.find(blog => blog.title === 'Mathematics vol. 1');
-  console.log('addedBlog ', addedBlog);
   expect(addedBlog.likes).toBe(0);
 });
 
@@ -104,6 +103,27 @@ test('adding blog without title and url fails', async () =>  {
     .post('/api/blogs')
     .send(testBlogWithUndefinedLikes)
     .expect(400);
+});
+
+test('removing blog', async () =>  {
+  let response = await api.get('/api/blogs');
+  const numberOfBlogs = response.body.length;
+  const blog = response.body[0];
+
+  await api
+    .delete('/api/blogs/' + blog.id)
+    .expect(200);
+
+
+  response = await api.get('/api/blogs');
+  const numberOfBlogs2 = response.body.length;
+  expect( numberOfBlogs2 ).toBe( numberOfBlogs - 1 );
+});
+
+test('removing blog with invalid id fails', async () =>  {
+  await api
+    .delete('/api/blogs/' + '1232434')
+    .expect(500);
 });
 
 afterAll(() => {

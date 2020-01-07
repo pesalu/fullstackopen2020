@@ -20,4 +20,13 @@ notesRouter.post('/', (request, response, next) => {
     .catch(error => next(error));
 });
 
+notesRouter.delete('/:id', async (request, response, next) => {
+  try {
+    const result = await Blog.findByIdAndRemove(request.params.id);
+    response.status(200).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = notesRouter;
