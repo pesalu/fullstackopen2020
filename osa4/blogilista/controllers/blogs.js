@@ -20,6 +20,25 @@ notesRouter.post('/', (request, response, next) => {
     .catch(error => next(error));
 });
 
+notesRouter.put('/:id', async (request, response, next) => {
+  const body = request.body;
+
+  const blogWithNewData = {
+    likes: body.likes
+  }
+
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      blogWithNewData,
+      { new: true }
+    );
+    response.json(updatedBlog);
+  } catch (error) {
+    next(error);
+  }
+});
+
 notesRouter.delete('/:id', async (request, response, next) => {
   try {
     const result = await Blog.findByIdAndRemove(request.params.id);

@@ -105,6 +105,23 @@ test('adding blog without title and url fails', async () =>  {
     .expect(400);
 });
 
+test('modifying likes of an existing blog', async () => {
+  let response = await api.get('/api/blogs');
+  const blog = response.body[0];
+  const blogWithModifiedLikes = {
+    likes: blog.likes + 200,
+  }
+
+  const putResponse = await api
+    .put('/api/blogs/' + blog.id)
+    .send(blogWithModifiedLikes)
+    .expect(200);
+
+  let modifiedBlog = putResponse.body;
+  expect(modifiedBlog.likes).toBe(blog.likes + 200);
+});
+
+
 test('removing blog', async () =>  {
   let response = await api.get('/api/blogs');
   const numberOfBlogs = response.body.length;
@@ -113,7 +130,6 @@ test('removing blog', async () =>  {
   await api
     .delete('/api/blogs/' + blog.id)
     .expect(200);
-
 
   response = await api.get('/api/blogs');
   const numberOfBlogs2 = response.body.length;
