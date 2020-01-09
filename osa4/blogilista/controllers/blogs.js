@@ -1,5 +1,6 @@
 const notesRouter = require('express').Router();
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 notesRouter.get('/', (request, response) => {
   Blog
@@ -9,15 +10,28 @@ notesRouter.get('/', (request, response) => {
     })
 })
 
-notesRouter.post('/', (request, response, next) => {
-  const blog = new Blog(request.body);
+notesRouter.post('/', async (request, response, next) => {
+  const blog = request.body;
 
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    })
-    .catch(error => next(error));
+  const newBlog = new Blog({
+    title: blog.title,
+    author: blog.author,
+    url: blog.url,
+    likes: blog.likes,
+  });
+
+  if (blog.userId) {
+    const user = await User.findById(blog.userId);
+    newBlog.user = user ? user._id : undefined;
+  }
+
+  try {
+    const savedNote = await newBlog.save();
+    response.status(201).json(savedNote);
+  } catch (error) {
+    next(error);
+  }
+
 });
 
 notesRouter.put('/:id', async (request, response, next) => {

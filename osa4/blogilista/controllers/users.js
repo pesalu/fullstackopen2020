@@ -7,7 +7,7 @@ usersRouter.get('/', async (request, response, next) => {
     User
       .find({})
       .then(users => {
-        response.json(users);
+        response.json(users.map(u => u.toJSON()));
       });
   } catch (error) {
     next(error);
