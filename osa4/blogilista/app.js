@@ -5,6 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const blogRouter = require('./controllers/blogs');
 const userRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware');
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.static('build'));
 app.use(bodyParser.json());
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
+app.use('/api/login', loginRouter);
 
 // Middlwares
 app.use(middleware.errorHandler);
