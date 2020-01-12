@@ -2,13 +2,11 @@ const notesRouter = require('express').Router();
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
-notesRouter.get('/', (request, response) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-})
+notesRouter.get('/', async (request, response) => {
+  const blogs = await Blog
+    .find({}).populate('user', { username: 1, name: 1 });
+  response.json(blogs.map(blog => blog.toJSON()))
+});
 
 notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
@@ -20,13 +18,19 @@ notesRouter.post('/', async (request, response, next) => {
     likes: blog.likes,
   });
 
+  let user = undefined;
   if (blog.userId) {
-    const user = await User.findById(blog.userId);
+    user = await User.findById(blog.userId);
     newBlog.user = user ? user._id : undefined;
   }
 
   try {
     const savedNote = await newBlog.save();
+    console.log('USER ', user);
+    if (user) {
+      user.blogs = user.blogs.concat(savedNote._id);
+      await user.save();
+    }
     response.status(201).json(savedNote);
   } catch (error) {
     next(error);

@@ -6,11 +6,13 @@ const passwordIsValid = require('../utils/validation_helper');
 
 usersRouter.get('/', async (request, response, next) => {
   try {
-    User
-      .find({})
-      .then(users => {
-        response.json(users.map(u => u.toJSON()));
-      });
+    const users = await User.find({}).populate('blogs', {url: 1, title: 1, author: 1});
+    response.json(users.map(user => user.toJSON()));
+    // User
+    //   .find({})
+    //   .then(users => {
+    //     response.json(users.map(u => u.toJSON()));
+    //   });
   } catch (error) {
     next(error);
   }
@@ -21,7 +23,6 @@ usersRouter.post('/', async (request, response, next) => {
     const body = request.body
 
     if(!passwordIsValid(body.password)) {
-      console.log('BODY  ', body);
       response.status(400).send({ error: 'invalid password!' });
     }
 
