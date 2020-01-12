@@ -1,0 +1,10 @@
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBlZHJvIiwiaWQiOiI1ZTFiMTU3NzE4MjNmNjI5NGY0YWI2ZjYiLCJpYXQiOjE1Nzg4MzcwNzh9.0vXeo2BxR1uvSqyFPrGjIlBvHfQlvjyAWRaLohpgwgw
+
+{
+  "title": "Refactoring java code part 5",
+  "author": "Petri L.",
+  "url": "becomefullstack.com",
+  "likes": 1
+}

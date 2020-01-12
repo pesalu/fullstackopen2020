@@ -1,4 +1,7 @@
 const notesRouter = require('express').Router();
+const jwt = require('jsonwebtoken');
+const getTokenFrom = require('../utils/authentication_helper');
+const config = require('../utils/config');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
@@ -11,27 +14,30 @@ notesRouter.get('/', async (request, response) => {
 notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
 
-  const newBlog = new Blog({
-    title: blog.title,
-    author: blog.author,
-    url: blog.url,
-    likes: blog.likes,
-  });
-
-  let user = undefined;
-  if (blog.userId) {
-    user = await User.findById(blog.userId);
-    newBlog.user = user ? user._id : undefined;
-  }
-
   try {
-    const savedNote = await newBlog.save();
-    console.log('USER ', user);
-    if (user) {
-      user.blogs = user.blogs.concat(savedNote._id);
-      await user.save();
+    const token = getTokenFrom(request);
+    console.log('TOKEN ', token);
+    const decodedToken = jwt.verify(token, config.SECRET)
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
     }
-    response.status(201).json(savedNote);
+
+    const user = await User.findById(decodedToken.id)
+
+    const newBlog = new Blog({
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes,
+      user: user._id
+    });
+    console.log('USER ', user);
+
+    const savedBlog = await newBlog.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
+
+    response.status(201).json(savedBlog);
   } catch (error) {
     next(error);
   }
