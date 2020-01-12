@@ -1,6 +1,8 @@
-const bcrypt = require('bcrypt')
-const usersRouter = require('express').Router()
-const User = require('../models/user')
+const bcrypt = require('bcrypt');
+const usersRouter = require('express').Router();
+const User = require('../models/user');
+
+const passwordIsValid = require('../utils/validation_helper');
 
 usersRouter.get('/', async (request, response, next) => {
   try {
@@ -18,6 +20,11 @@ usersRouter.post('/', async (request, response, next) => {
   try {
     const body = request.body
 
+    if(!passwordIsValid(body.password)) {
+      console.log('BODY  ', body);
+      response.status(400).send({ error: 'invalid password!' });
+    }
+
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
@@ -33,6 +40,7 @@ usersRouter.post('/', async (request, response, next) => {
   } catch (exception) {
     next(exception)
   }
-})
+
+});
 
 module.exports = usersRouter

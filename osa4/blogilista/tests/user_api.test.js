@@ -30,9 +30,9 @@ describe('when there is initially one user at db', () => {
       .post('/api/users')
       .send(newUser)
       .expect(200)
-      .expect('Content-Type', /application\/json/)
+      .expect('Content-Type', /application\/json/);
 
-    const usersAtEnd = await helper.usersInDb()
+    const usersAtEnd = await helper.usersInDb();
     expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
 
     const usernames = usersAtEnd.map(u => u.username)
@@ -81,7 +81,28 @@ describe('when there is initially one user at db', () => {
     expect(usersAtEnd.length).toBe(usersAtStart.length)
   });
 
-})
+  test('creation fails with proper statuscode and message if password is less than 3 characters long', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'Pedro',
+      name: 'Superuser',
+      password: 'SA',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    expect(result.body.error).toContain('invalid password!');
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd.length).toBe(usersAtStart.length)
+  });
+
+});
 
 afterAll(() => {
     mongoose.connection.close()
