@@ -1,10 +1,10 @@
 POST http://localhost:3000/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBlZHJvIiwiaWQiOiI1ZTFiMTU3NzE4MjNmNjI5NGY0YWI2ZjYiLCJpYXQiOjE1Nzg4MzcwNzh9.0vXeo2BxR1uvSqyFPrGjIlBvHfQlvjyAWRaLohpgwgw
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBlZHJva2FzIiwiaWQiOiI1ZTI0NGE0ZmM4ZmM3NzgxOWZiMjZmMjkiLCJpYXQiOjE1Nzk0NDAwODd9.5IfGCwiLpvns_0JCvz0hNXWpUAp7D2Ao57D-pGSQE44
 
 {
-  "title": "Refactoring java code part 5",
+  "title": "Python 7",
   "author": "Petri L.",
-  "url": "becomefullstack.com",
+  "url": "python.com",
   "likes": 1
 }

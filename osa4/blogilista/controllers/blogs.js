@@ -6,21 +6,24 @@ const Blog = require('../models/blog');
 const User = require('../models/user');
 
 notesRouter.get('/', async (request, response) => {
-  const blogs = await Blog
-    .find({}).populate('user', { username: 1, name: 1 });
-  response.json(blogs.map(blog => blog.toJSON()))
+  try {
+    const decodedToken = getDecodedToken(request);
+
+    const blogs = await Blog
+      .find({}).populate('user', { username: 1, name: 1 });
+    response.json(blogs.map(blog => blog.toJSON()));
+  } catch (error) {
+    next(error);
+  }
 });
+
+
 
 notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
 
   try {
-    const token = getTokenFrom(request);
-    console.log('TOKEN ', token);
-    const decodedToken = jwt.verify(token, config.SECRET)
-    if (!token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
-    }
+    const decodedToken = getDecodedToken(request);
 
     const user = await User.findById(decodedToken.id)
 
@@ -31,7 +34,6 @@ notesRouter.post('/', async (request, response, next) => {
       likes: blog.likes,
       user: user._id
     });
-    console.log('USER ', user);
 
     const savedBlog = await newBlog.save();
     user.blogs = user.blogs.concat(savedBlog._id);
@@ -43,6 +45,15 @@ notesRouter.post('/', async (request, response, next) => {
   }
 
 });
+
+const getDecodedToken = (request) => {
+  const decodedToken = jwt.verify(request.token, config.SECRET);
+
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  return decodedToken;
+}
 
 notesRouter.put('/:id', async (request, response, next) => {
   const body = request.body;

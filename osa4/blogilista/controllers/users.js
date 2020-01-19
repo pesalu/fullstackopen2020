@@ -18,6 +18,7 @@ usersRouter.get('/', async (request, response, next) => {
   }
 });
 
+// Create a user
 usersRouter.post('/', async (request, response, next) => {
   try {
     const body = request.body

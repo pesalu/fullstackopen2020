@@ -15,10 +15,16 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true });
 app.use(cors());
 app.use(express.static('build'));
 app.use(bodyParser.json());
+
+// Middleware before routes
+app.use(middleware.addTokenToFromAuthorizationHeaderRequest);
+
+// Routes
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
 
-// Middlwares
+// Middlewares after routes
 app.use(middleware.errorHandler);
+
 module.exports = app;

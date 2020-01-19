@@ -1,3 +1,5 @@
+const getTokenFrom = require('./authentication_helper');
+
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
@@ -12,6 +14,15 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
+const addTokenToFromAuthorizationHeaderRequest = (request, response, next) => {
+  console.log('HEREEEEE +++');
+  const token = getTokenFrom(request);
+  console.log('TOKEN 1 ', token);
+  request.token = token;
+  next();
+}
+
 module.exports = {
-  errorHandler
+  errorHandler,
+  addTokenToFromAuthorizationHeaderRequest
 }

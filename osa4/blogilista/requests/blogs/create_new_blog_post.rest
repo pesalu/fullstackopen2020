@@ -2,8 +2,8 @@ POST http://localhost:3000/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Refactoring java code",
+  "title": "Python coding",
   "author": "Petri L.",
-  "url": "becomefullstack.com",
-  "likes": 1,
+  "url": "python.com",
+  "likes": 1
 }
