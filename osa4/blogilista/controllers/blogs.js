@@ -18,6 +18,16 @@ notesRouter.get('/', async (request, response) => {
 });
 
 
+notesRouter.get('/:id', async (request, response) => {
+  try {
+    const blog = await Blog.findById(request.params.id);
+    response.json(blog);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
@@ -25,7 +35,7 @@ notesRouter.post('/', async (request, response, next) => {
   try {
     const decodedToken = getDecodedToken(request);
 
-    const user = await User.findById(decodedToken.id)
+    const user = await User.findById(decodedToken.id);
 
     const newBlog = new Blog({
       title: blog.title,
@@ -76,8 +86,18 @@ notesRouter.put('/:id', async (request, response, next) => {
 
 notesRouter.delete('/:id', async (request, response, next) => {
   try {
-    const result = await Blog.findByIdAndRemove(request.params.id);
-    response.status(200).end();
+    const decodedToken = getDecodedToken(request);
+    const blogToBeRemoved = await Blog.findById(request.params.id);
+
+    if (blogToBeRemoved && decodedToken.id === blogToBeRemoved.user.toString()) {
+      const removedBlog = await Blog.findByIdAndRemove(request.params.id);
+      response.status(200).end();
+    } else if (!blogToBeRemoved) {
+      return response.status(401).json({ error: 'blog not found by id' });
+    } else {
+      return response.status(401).json({ error: 'not authorized to remove this blog' });
+    }
+
   } catch (error) {
     next(error);
   }
