@@ -7,7 +7,10 @@ Testejä, joita pitää korjata, ja joihin pitää
   ✕ adding blog without title and url fails (141ms)
   ✕ modifying likes of an existing blog (153ms)
   ✕ removing blog (144ms)
+    - tässä täytyy lisätä ensin blogi käyttäjällä ja sitten testata, että voi poistaa sen 
+
   ✕ removing blog with invalid id fails (151ms)
 
 
-  
+- uusia testejä:
+    - jos on lisätty blogi jollain toisella käyttäjällä, ei voi poistaa toisella käyttäjällä

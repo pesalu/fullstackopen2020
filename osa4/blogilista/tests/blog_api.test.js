@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Blog = require('../models/blog');
 const supertest = require('supertest');
 const app = require('../app');
-
+const User = require('../models/user');
 const api = supertest(app);
 
 const initialBlogs = [
@@ -33,14 +33,33 @@ const initialUsers = [
   },
 ];
 
+const newUser = {
+  username: 'mluukkai',
+  name: 'Matti Luukkainen',
+  password: 'salainen',
+}
+
 beforeEach(async () => {
   await Blog.deleteMany({});
 
-  let blogObject = new Blog(initialBlogs[0])
-  await blogObject.save()
+  let blogObject = new Blog(initialBlogs[0]);
+  await blogObject.save();
 
-  blogObject = new Blog(initialBlogs[1])
-  await blogObject.save()
+  blogObject = new Blog(initialBlogs[1]);
+  await blogObject.save();
+
+  // Delete all users first
+  await User.deleteMany({});
+
+  const user = new User({ username: 'root', name: 'rootName', password: 'sekret' })
+  await user.save();
+
+  await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
 });
 
 test('blogs are returned as json', async () => {
@@ -61,6 +80,8 @@ test('the identifying field of blog is \'id\' ', async () => {
 });
 
 test('a valid blog can be added ', async () => {
+  console.log('New user ', newUser);
+
   const testBlog = {
     'title': 'Liisa Karjalassa',
     'author': 'Pekka von Puurtimo',
@@ -68,11 +89,12 @@ test('a valid blog can be added ', async () => {
     'likes': 0
   };
 
-  // Create user
-  const responseUser = await api.post('/api/user')
+  // Login first
+  const token = await loginFirst();
 
   await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer ' + token)
     .send(testBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
@@ -95,13 +117,19 @@ test('set the value of \'likes\' in a blog to zero by default', async () => {
     'likes': undefined
   };
 
+  const token = await loginFirst();
+
   await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer ' + token)
     .send(testBlogWithUndefinedLikes)
     .expect(201)
     .expect('Content-Type', /application\/json/);
 
-  const response = await api.get('/api/blogs');
+
+  const response = await api
+    .get('/api/blogs')
+    .set('Authorization', 'Bearer ' + token);
   const addedBlog = response.body.find(blog => blog.title === 'Mathematics vol. 1');
   expect(addedBlog.likes).toBe(0);
 });
@@ -114,8 +142,11 @@ test('adding blog without title and url fails', async () =>  {
     'likes': undefined
   };
 
+  const token = await loginFirst();
+
   await api
     .post('/api/blogs')
+    .set('Authorization', 'Bearer ' + token)
     .send(testBlogWithUndefinedLikes)
     .expect(400);
 });
@@ -137,13 +168,17 @@ test('modifying likes of an existing blog', async () => {
 });
 
 
-test('removing blog', async () =>  {
+test('removing blog that has been added by the user', async () =>  {
   let response = await api.get('/api/blogs');
   const numberOfBlogs = response.body.length;
+  console.log('BLOGS ', response.body)
   const blog = response.body[0];
+
+  const token = await loginFirst();
 
   await api
     .delete('/api/blogs/' + blog.id)
+    .set('Authorization', 'Bearer ' + token)
     .expect(200);
 
   response = await api.get('/api/blogs');
@@ -160,3 +195,11 @@ test('removing blog with invalid id fails', async () =>  {
 afterAll(() => {
   mongoose.connection.close()
 });
+
+async function loginFirst() {
+  const userResponse = await api
+    .post('/api/login')
+    .send(newUser);
+  const token = userResponse.body.token;
+  return token;
+}
