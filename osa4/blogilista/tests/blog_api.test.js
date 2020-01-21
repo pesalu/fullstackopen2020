@@ -20,6 +20,19 @@ const initialBlogs = [
   }
 ];
 
+const initialUsers = [
+  {
+    'username': 'pedro123',
+    'name': 'Pedro',
+    'password': 'salsa'
+  },
+  {
+    'username': 'angelina777',
+    'name': 'Angelina',
+    "password": "kastike"
+  },
+];
+
 beforeEach(async () => {
   await Blog.deleteMany({});
 
@@ -29,7 +42,6 @@ beforeEach(async () => {
   blogObject = new Blog(initialBlogs[1])
   await blogObject.save()
 });
-
 
 test('blogs are returned as json', async () => {
   await api
@@ -55,6 +67,9 @@ test('a valid blog can be added ', async () => {
     'url': 'test.fi/1',
     'likes': 0
   };
+
+  // Create user
+  const responseUser = await api.post('/api/user')
 
   await api
     .post('/api/blogs')

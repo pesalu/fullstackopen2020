@@ -14,7 +14,6 @@ loginRouter.post('/', async (request, response) => {
       error: 'invalid username'
     })
   }
-
   let passwordCorrect;
   try {
     passwordCorrect = user === null

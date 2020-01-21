@@ -1,0 +1,13 @@
+Testejä, joita pitää korjata, ja joihin pitää 
+  ✕ blogs are returned as json (797ms)
+  ✕ all blogs are returned (148ms)
+  ✕ the identifying field of blog is 'id'  (145ms)
+  ✕ a valid blog can be added  (175ms)
+  ✕ set the value of 'likes' in a blog to zero by default (159ms)
+  ✕ adding blog without title and url fails (141ms)
+  ✕ modifying likes of an existing blog (153ms)
+  ✕ removing blog (144ms)
+  ✕ removing blog with invalid id fails (151ms)
+
+
+  

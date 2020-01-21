@@ -7,8 +7,6 @@ const User = require('../models/user');
 
 notesRouter.get('/', async (request, response) => {
   try {
-    const decodedToken = getDecodedToken(request);
-
     const blogs = await Blog
       .find({}).populate('user', { username: 1, name: 1 });
     response.json(blogs.map(blog => blog.toJSON()));
