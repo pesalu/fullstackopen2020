@@ -15,9 +15,7 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const addTokenToFromAuthorizationHeaderRequest = (request, response, next) => {
-  console.log('HEREEEEE +++');
   const token = getTokenFrom(request);
-  console.log('TOKEN 1 ', token);
   request.token = token;
   next();
 }
