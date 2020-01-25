@@ -87,7 +87,7 @@ notesRouter.delete('/:id', async (request, response, next) => {
     const decodedToken = getDecodedToken(request);
     const blogToBeRemoved = await Blog.findById(request.params.id);
 
-    if (blogToBeRemoved && decodedToken.id === blogToBeRemoved.user.toString()) {
+    if (blogToBeRemoved && blogToBeRemoved.user && blogToBeRemoved.user.toString() === decodedToken.id) {
       const removedBlog = await Blog.findByIdAndRemove(request.params.id);
       response.status(200).end();
     } else if (!blogToBeRemoved) {
