@@ -1,0 +1,9 @@
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Python coding",
+  "author": "Petri L.",
+  "url": "python.com",
+  "likes": 1
+}
