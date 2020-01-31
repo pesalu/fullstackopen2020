@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import loginService from './services/login';
 import blogService from './services/blogs';
 import Blog from './components/Blog';
+import Blogs from './components/Blogs';
+import Login from './components/Login';
 import Notification from './components/Notification';
 
 const App = () => {
@@ -32,48 +34,25 @@ const App = () => {
     }
   }
 
-  const getBlogComponents = () => blogs.map(blog =>
-    <Blog
-      key={blog.id}
-      blog={blog}
-    />
-  )
+  const onChangeUsername = ({ target }) => setUsername(target.value);
+  const onChangePassword = ({ target }) => setPassword(target.value)
 
-  const loginForm = () => {
+  const showLoginFormOrBlogs = () => {
     if (user === null) {
-      return (
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-              <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
-              <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      )
+      return (<Login 
+        username={username} 
+        password={password} 
+        onSubmit={handleLogin} 
+        onChangeUsername={onChangeUsername} 
+        onChangePassword={onChangePassword} />)
     } else {
       return (
         <div>
         <p>{user.name} logged in</p>
-        {getBlogComponents()}
-        {/* {noteForm()} */}
+        <Blogs blogs={blogs} />
         </div>
       )
     }
-
   }
 
   return (
@@ -81,7 +60,7 @@ const App = () => {
       <h1>Blogit</h1>
 
       <Notification message={errorMessage} />
-      { loginForm() }
+      { showLoginFormOrBlogs() }
     </>
   );
 }
