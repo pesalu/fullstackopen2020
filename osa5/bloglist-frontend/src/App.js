@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import loginService from './services/login';
 import blogService from './services/blogs';
 import Blog from './components/Blog';
@@ -14,6 +14,23 @@ const App = () => {
 
   const [errorMessage, setErrorMessage] = useState(null)
 
+  useEffect(() => {
+    blogService
+      .getAll()
+      .then(initialBlogs => setBlogs(initialBlogs));
+  }, []);
+
+  useEffect(() => {
+    const loggedInUserJSON = window.localStorage.getItem('loggedBloglistUser');
+    if (loggedInUserJSON) {
+      const user = JSON.parse(loggedInUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+      console.log('USER ', user);
+    }
+  }, []);
+
+
   const handleLogin = async (event) => {
     event.preventDefault()
     console.log('logging in with', username, password);
@@ -24,6 +41,9 @@ const App = () => {
       setUsername('');
       setPassword('');
 
+      // Set user with token to browsers memory
+      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
+
       await blogService
         .getAll()
         .then(initialBlogs => setBlogs(initialBlogs));
@@ -32,6 +52,14 @@ const App = () => {
       setErrorMessage('Wrong credentials');
       setTimeout(() => setErrorMessage(null), 5000);
     }
+  }
+
+  const handleLogout = async (event) => {
+    console.log('LOGOUT')
+    setUser(null);
+    setUsername('');
+    setPassword('');
+    window.localStorage.removeItem('loggedBloglistUser');
   }
 
   const onChangeUsername = ({ target }) => setUsername(target.value);
@@ -48,8 +76,11 @@ const App = () => {
     } else {
       return (
         <div>
-        <p>{user.name} logged in</p>
-        <Blogs blogs={blogs} />
+          <span>
+            {user.name} logged in 
+            <button type="submit" onClick={handleLogout}>logout</button>
+          </span>
+          <Blogs blogs={blogs} />
         </div>
       )
     }
