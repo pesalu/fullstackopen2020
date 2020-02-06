@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import loginService from './services/login';
 import blogService from './services/blogs';
-import Blog from './components/Blog';
 import Blogs from './components/Blogs';
+import BlogEditor from './components/BlogEditor';
 import Login from './components/Login';
 import Notification from './components/Notification';
 
@@ -12,7 +12,11 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const [newTitle, setTitle] = useState('');
+  const [newAuthor, setAuthor] = useState('');
+  const [newUrl, setUrl] = useState('');
 
   useEffect(() => {
     blogService
@@ -29,7 +33,6 @@ const App = () => {
       console.log('USER ', user);
     }
   }, []);
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -62,17 +65,41 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser');
   }
 
+  const handleBlogSubmit = async (event) => {
+    event.preventDefault();
+    const newBlog = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl
+    }
+    blogService
+      .create(newBlog)
+      .then(saveBlog => {
+        setBlogs(blogs.concat(saveBlog));
+        setTitle('');
+        setAuthor('');
+        setUrl('');
+      });
+    console.log('SUBMIT', newBlog);
+  }
+
   const onChangeUsername = ({ target }) => setUsername(target.value);
   const onChangePassword = ({ target }) => setPassword(target.value)
 
+  const onChangeTitle = ({ target }) => setTitle(target.value)
+  const onChangeAuthor = ({ target }) => setAuthor(target.value)
+  const onChangeUrl = ({ target }) => setUrl(target.value)
+
+
   const showLoginFormOrBlogs = () => {
     if (user === null) {
-      return (<Login 
-        username={username} 
-        password={password} 
-        onSubmit={handleLogin} 
-        onChangeUsername={onChangeUsername} 
-        onChangePassword={onChangePassword} />)
+      return (<Login
+        username={username}
+        password={password}
+        onSubmit={handleLogin}
+        onChangeUsername={onChangeUsername}
+        onChangePassword={onChangePassword} />
+      );
     } else {
       return (
         <div>
@@ -80,6 +107,14 @@ const App = () => {
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
+          <BlogEditor onSubmit={handleBlogSubmit} 
+                      title={newTitle} 
+                      author={newAuthor} 
+                      url={newUrl}
+                      onChangeTitle={onChangeTitle}
+                      onChangeAuthor={onChangeAuthor}
+                      onChangeUrl={onChangeUrl}
+          />
           <Blogs blogs={blogs} />
         </div>
       )
