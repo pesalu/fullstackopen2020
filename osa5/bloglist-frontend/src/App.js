@@ -14,10 +14,6 @@ const App = () => {
 
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const [newTitle, setTitle] = useState('');
-  const [newAuthor, setAuthor] = useState('');
-  const [newUrl, setUrl] = useState('');
-
   useEffect(() => {
     blogService
       .getAll()
@@ -50,6 +46,7 @@ const App = () => {
       await blogService
         .getAll()
         .then(initialBlogs => setBlogs(initialBlogs));
+
     } catch (error) {
       console.log('ERROR ', error.message);
       setErrorMessage('Wrong credentials');
@@ -65,31 +62,12 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser');
   }
 
-  const handleBlogSubmit = async (event) => {
-    event.preventDefault();
-    const newBlog = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
-    blogService
-      .create(newBlog)
-      .then(saveBlog => {
-        setBlogs(blogs.concat(saveBlog));
-        setTitle('');
-        setAuthor('');
-        setUrl('');
-      });
-    console.log('SUBMIT', newBlog);
+  const updateView = async (newBlog) => {
+    setBlogs(blogs.concat(newBlog));
   }
 
   const onChangeUsername = ({ target }) => setUsername(target.value);
-  const onChangePassword = ({ target }) => setPassword(target.value)
-
-  const onChangeTitle = ({ target }) => setTitle(target.value)
-  const onChangeAuthor = ({ target }) => setAuthor(target.value)
-  const onChangeUrl = ({ target }) => setUrl(target.value)
-
+  const onChangePassword = ({ target }) => setPassword(target.value);
 
   const showLoginFormOrBlogs = () => {
     if (user === null) {
@@ -107,14 +85,7 @@ const App = () => {
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
-          <BlogEditor onSubmit={handleBlogSubmit} 
-                      title={newTitle} 
-                      author={newAuthor} 
-                      url={newUrl}
-                      onChangeTitle={onChangeTitle}
-                      onChangeAuthor={onChangeAuthor}
-                      onChangeUrl={onChangeUrl}
-          />
+          <BlogEditor updateView={updateView} />
           <Blogs blogs={blogs} />
         </div>
       )

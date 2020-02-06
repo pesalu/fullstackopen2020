@@ -1,20 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
+import blogService from '../services/blogs';
 
-const BlogEditor = ({onSubmit, 
-  title, 
-  author, 
-  url, 
-  onChangeTitle, 
-  onChangeAuthor, 
-  onChangeUrl}) => {
+const BlogEditor = ({updateView}) => {
+
+  const [newTitle, setTitle] = useState('');
+  const [newAuthor, setAuthor] = useState('');
+  const [newUrl, setUrl] = useState('');
+
+  const onChangeTitle = ({ target }) => setTitle(target.value)
+  const onChangeAuthor = ({ target }) => setAuthor(target.value)
+  const onChangeUrl = ({ target }) => setUrl(target.value)
+
+  const handleBlogSubmit = async (event) => {
+    event.preventDefault();
+    const newBlog = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl
+    }
+    const savedBlog = await blogService
+      .create(newBlog)
+    updateView(savedBlog);
+    setTitle('');
+    setAuthor('');
+    setUrl('');
+  }
+
   return (
-  <form onSubmit={onSubmit}>
+  <form onSubmit={handleBlogSubmit}>
     <div>
       <div>
         title
         <input 
           type="text"
-          value={title}
+          value={newTitle}
           onChange={onChangeTitle}
         />
       </div>
@@ -22,7 +41,7 @@ const BlogEditor = ({onSubmit,
         author
         <input 
           type="text"
-          value={author}
+          value={newAuthor}
           onChange={onChangeAuthor}
         />
       </div>
@@ -30,7 +49,7 @@ const BlogEditor = ({onSubmit,
         url
         <input 
           type="text"
-          value={url}
+          value={newUrl}
           onChange={onChangeUrl}
         />
       </div>
