@@ -12,18 +12,30 @@ const BlogEditor = ({updateView}) => {
   const onChangeUrl = ({ target }) => setUrl(target.value)
 
   const handleBlogSubmit = async (event) => {
-    event.preventDefault();
-    const newBlog = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
+    try {
+      event.preventDefault();
+      const newBlog = {
+        title: newTitle,
+        author: newAuthor,
+        url: newUrl
+      }
+      const savedBlog = await blogService
+        .create(newBlog);
+
+      updateView(savedBlog);
+      setTitle('');
+      setAuthor('');
+      setUrl('');
+    } catch (error) {
+      let errorMessage = undefined;
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      } else {
+        errorMessage = error.message;
+      }
+      updateView(undefined, errorMessage);
     }
-    const savedBlog = await blogService
-      .create(newBlog)
-    updateView(savedBlog);
-    setTitle('');
-    setAuthor('');
-    setUrl('');
+
   }
 
   return (

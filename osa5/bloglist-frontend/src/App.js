@@ -12,6 +12,7 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
+  const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
@@ -62,8 +63,19 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser');
   }
 
-  const updateView = async (newBlog) => {
-    setBlogs(blogs.concat(newBlog));
+  const updateView = async (newBlog, message) => {
+
+    if (!newBlog) {
+      setErrorMessage(message);
+      setTimeout(() => setErrorMessage(null), 5000);
+    } else {
+      setBlogs(blogs.concat(newBlog));
+      console.log('HERE!', newBlog)
+      const msg = 'Blog \'' + newBlog.title + '\' by ' + newBlog.author + ' was added.';
+
+      setSuccessMessage(msg);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    }
   }
 
   const onChangeUsername = ({ target }) => setUsername(target.value);
@@ -96,6 +108,7 @@ const App = () => {
     <>
       <h1>Blogit</h1>
 
+      <Notification message={successMessage} />
       <Notification message={errorMessage} />
       { showLoginFormOrBlogs() }
     </>
