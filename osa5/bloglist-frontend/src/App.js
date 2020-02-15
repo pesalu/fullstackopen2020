@@ -5,6 +5,7 @@ import Blogs from './components/Blogs';
 import BlogEditor from './components/BlogEditor';
 import Login from './components/Login';
 import Notification from './components/Notification';
+import Togglable from './components/logical/Togglable';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -27,7 +28,6 @@ const App = () => {
       const user = JSON.parse(loggedInUserJSON);
       setUser(user);
       blogService.setToken(user.token);
-      console.log('USER ', user);
     }
   }, []);
 
@@ -97,7 +97,9 @@ const App = () => {
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
-          <BlogEditor updateView={updateView} />
+          <Togglable buttonLabel="New blog">
+            <BlogEditor updateView={updateView} />
+          </Togglable>
           <Blogs blogs={blogs} />
         </div>
       )
