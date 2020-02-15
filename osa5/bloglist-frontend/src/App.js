@@ -16,6 +16,8 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const blogEditorRef = React.createRef();
+
   useEffect(() => {
     blogService
       .getAll()
@@ -69,6 +71,8 @@ const App = () => {
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(null), 5000);
     } else {
+      blogEditorRef.current.toggleVisibility();
+
       setBlogs(blogs.concat(newBlog));
       console.log('HERE!', newBlog)
       const msg = 'Blog \'' + newBlog.title + '\' by ' + newBlog.author + ' was added.';
@@ -97,9 +101,11 @@ const App = () => {
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
-          <Togglable buttonLabel="New blog">
+
+          <Togglable buttonLabel="New blog" ref={blogEditorRef}>
             <BlogEditor updateView={updateView} />
           </Togglable>
+
           <Blogs blogs={blogs} />
         </div>
       )
