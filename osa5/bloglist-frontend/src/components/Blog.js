@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLikesIncrements }) => {
 
   const [expanded, setExpanded] = useState('');
+  const [likes, setLikes] = useState('');
 
   const blogStyle = {
     paddingTop: 10,
@@ -15,10 +16,15 @@ const Blog = ({ blog }) => {
   const expandBlog = () => setExpanded(!expanded);
   const showWhenVisible = { display: expanded ? '' : 'none' };
 
-  console.log('BLOG ', blog);
+  const handleLikesIncrement = () => () => {
+    blog.likes += 1;
+    setLikes(blog.likes);
+    handleLikesIncrements(blog);
+  }
+
   return (
     <div style={blogStyle}>
-      <div onClick={() => expandBlog()}>
+      <div onClick={expandBlog}>
         {blog.title}
       </div>
       {blog.author}
@@ -27,7 +33,7 @@ const Blog = ({ blog }) => {
           <a href={blog.url}>{blog.url}</a>
         </div>
         <div>
-          {blog.likes} likes <button>Like</button>
+          {blog.likes} likes <button onClick={handleLikesIncrement()}>Like</button>
         </div>
         <div>
           {

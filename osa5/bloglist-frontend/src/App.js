@@ -85,6 +85,11 @@ const App = () => {
   const onChangeUsername = ({ target }) => setUsername(target.value);
   const onChangePassword = ({ target }) => setPassword(target.value);
 
+  const handleLikesIncrements = async (blog) => {
+    blog = await blogService.update(blog);
+    setBlogs(blogs);
+  };
+
   const showLoginFormOrBlogs = () => {
     if (user === null) {
       return (<Login
@@ -106,7 +111,7 @@ const App = () => {
             <BlogEditor updateView={updateView} />
           </Togglable>
 
-          <Blogs blogs={blogs} />
+          <Blogs blogs={blogs} handleLikesIncrements={handleLikesIncrements} />
         </div>
       )
     }
