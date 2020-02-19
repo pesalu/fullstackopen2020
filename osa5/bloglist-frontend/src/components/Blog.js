@@ -46,8 +46,8 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
             blog.user ? 'Added by user ' + blog.user.name : ''
           }
         </div>
-        <br />
         <div style={showRemoveButton}>
+          <br />
           <button onClick={removeBlog()}>Remove</button>
         </div>
       </div>
