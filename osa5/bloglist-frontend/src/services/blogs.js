@@ -38,4 +38,24 @@ const update = async (blog) => {
   return response.data;
 }
 
-export default { getAll, setToken, create, update }
+const remove = async (blog) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  const response = await axios
+    .delete(baseUrl + '/' + blog.id, config);
+
+  return response;
+}
+
+
+const enrichWithPermissions = (blogs, user) => {
+  blogs.forEach(blog => {
+    blog.canRemove = blog.user ? (blog.user.username === user.username) : false;
+  });
+
+  blogs.forEach(blog => {console.log('BLOG ++ ', blog)});
+}
+
+export default { getAll, setToken, create, update, remove, enrichWithPermissions }

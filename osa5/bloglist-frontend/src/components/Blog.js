@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, handleLikesIncrements }) => {
+const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
   const [expanded, setExpanded] = useState('');
   const [likes, setLikes] = useState('');
@@ -16,10 +16,16 @@ const Blog = ({ blog, handleLikesIncrements }) => {
   const expandBlog = () => setExpanded(!expanded);
   const showWhenVisible = { display: expanded ? '' : 'none' };
 
+  const showRemoveButton = { display: blog.canRemove ? '' : 'none' }
+
   const handleLikesIncrement = () => () => {
     blog.likes += 1;
     setLikes(blog.likes);
     handleLikesIncrements(blog);
+  }
+
+  const removeBlog = () => () => {
+    handleRemovalOfBlog(blog);
   }
 
   return (
@@ -39,6 +45,10 @@ const Blog = ({ blog, handleLikesIncrements }) => {
           {
             blog.user ? 'Added by user ' + blog.user.name : ''
           }
+        </div>
+        <br />
+        <div style={showRemoveButton}>
+          <button onClick={removeBlog()}>Remove</button>
         </div>
       </div>
     </div>

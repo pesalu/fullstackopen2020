@@ -31,14 +31,15 @@ const App = () => {
       setUser(user);
       blogService.setToken(user.token);
     }
-  }, []);
+  }, [blogs]);
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log('logging in with', username, password);
+    console.log('logging in with', username);
     const credentials = {username, password};
     try {
       const user = await loginService.login(credentials);
+
       setUser(user);
       setUsername('');
       setPassword('');
@@ -46,9 +47,9 @@ const App = () => {
       // Set user with token to browsers memory
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
 
-      await blogService
-        .getAll()
-        .then(initialBlogs => setBlogs(initialBlogs));
+      let initialBlogs = await blogService.getAll();
+      blogService.enrichWithPermissions(initialBlogs, user);
+      setBlogs(initialBlogs);
 
     } catch (error) {
       console.log('ERROR ', error.message);
@@ -86,8 +87,24 @@ const App = () => {
   const onChangePassword = ({ target }) => setPassword(target.value);
 
   const handleLikesIncrements = async (blog) => {
-    blog = await blogService.update(blog);
-    setBlogs(blogs);
+    try {
+      blog = await blogService.update(blog);
+      setBlogs(blogs);  
+    } catch (error) {
+      setErrorMessage(error.response.data.message);
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
+  };
+
+  const handleRemovalOfBlog = async (blog) => {
+    try {
+      await blogService.remove(blog);
+      setBlogs(blogs.filter(blogTmp => blogTmp.id !== blog.id));
+    } catch (error) {
+      console.log('ERROR ', error.response.data.message);
+      setErrorMessage(error.response.data.error);
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
   };
 
   const showLoginFormOrBlogs = () => {
@@ -111,7 +128,9 @@ const App = () => {
             <BlogEditor updateView={updateView} />
           </Togglable>
 
-          <Blogs blogs={blogs} handleLikesIncrements={handleLikesIncrements} />
+          <Blogs blogs={blogs} 
+                 handleLikesIncrements={handleLikesIncrements} 
+                 handleRemovalOfBlog={handleRemovalOfBlog} />
         </div>
       )
     }
