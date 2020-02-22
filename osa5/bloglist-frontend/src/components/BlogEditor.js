@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import blogService from '../services/blogs';
+import PropTypes from 'prop-types';
 
 const BlogEditor = ({updateView}) => {
 
@@ -7,9 +8,9 @@ const BlogEditor = ({updateView}) => {
   const [newAuthor, setAuthor] = useState('');
   const [newUrl, setUrl] = useState('');
 
-  const onChangeTitle = ({ target }) => setTitle(target.value)
-  const onChangeAuthor = ({ target }) => setAuthor(target.value)
-  const onChangeUrl = ({ target }) => setUrl(target.value)
+  const onChangeTitle = ({ target }) => setTitle(target.value);
+  const onChangeAuthor = ({ target }) => setAuthor(target.value);
+  const onChangeUrl = ({ target }) => setUrl(target.value);
 
   const handleBlogSubmit = async (event) => {
     try {
@@ -18,7 +19,7 @@ const BlogEditor = ({updateView}) => {
         title: newTitle,
         author: newAuthor,
         url: newUrl
-      }
+      };
       const savedBlog = await blogService
         .create(newBlog);
 
@@ -36,41 +37,46 @@ const BlogEditor = ({updateView}) => {
       updateView(undefined, errorMessage);
     }
 
-  }
+  };
 
   return (
-  <form onSubmit={handleBlogSubmit}>
-    <div>
+    <form onSubmit={handleBlogSubmit}>
       <div>
+        <div>
         title
-        <input 
-          type="text"
-          value={newTitle}
-          onChange={onChangeTitle}
-        />
-      </div>
-      <div>
+          <input 
+            type="text"
+            value={newTitle}
+            onChange={onChangeTitle}
+          />
+        </div>
+        <div>
         author
-        <input 
-          type="text"
-          value={newAuthor}
-          onChange={onChangeAuthor}
-        />
-      </div>
-      <div>
+          <input 
+            type="text"
+            value={newAuthor}
+            onChange={onChangeAuthor}
+          />
+        </div>
+        <div>
         url
-        <input 
-          type="text"
-          value={newUrl}
-          onChange={onChangeUrl}
-        />
-      </div>
+          <input 
+            type="text"
+            value={newUrl}
+            onChange={onChangeUrl}
+          />
+        </div>
 
-      <div>
-        <button type="submit">Create</button>
+        <div>
+          <button type="submit">Create</button>
+        </div>
       </div>
-    </div>
-  </form>
-)};
+    </form>
+  );
+};
+
+BlogEditor.propTypes = {
+  updateView: PropTypes.func.isRequired
+};
 
 export default BlogEditor;

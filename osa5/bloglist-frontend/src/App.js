@@ -34,8 +34,7 @@ const App = () => {
   }, [blogs]);
 
   const handleLogin = async (event) => {
-    event.preventDefault()
-    console.log('logging in with', username);
+    event.preventDefault();
     const credentials = {username, password};
     try {
       const user = await loginService.login(credentials);
@@ -52,19 +51,17 @@ const App = () => {
       setBlogs(initialBlogs);
 
     } catch (error) {
-      console.log('ERROR ', error.message);
       setErrorMessage('Wrong credentials');
       setTimeout(() => setErrorMessage(null), 5000);
     }
-  }
+  };
 
-  const handleLogout = async (event) => {
-    console.log('LOGOUT')
+  const handleLogout = async () => {
     setUser(null);
     setUsername('');
     setPassword('');
     window.localStorage.removeItem('loggedBloglistUser');
-  }
+  };
 
   const updateView = async (newBlog, message) => {
 
@@ -75,21 +72,20 @@ const App = () => {
       blogEditorRef.current.toggleVisibility();
 
       setBlogs(blogs.concat(newBlog));
-      console.log('HERE!', newBlog)
       const msg = 'Blog \'' + newBlog.title + '\' by ' + newBlog.author + ' was added.';
 
       setSuccessMessage(msg);
       setTimeout(() => setSuccessMessage(null), 5000);
     }
-  }
+  };
 
   const onChangeUsername = ({ target }) => setUsername(target.value);
   const onChangePassword = ({ target }) => setPassword(target.value);
 
   const handleLikesIncrements = async (blog) => {
     try {
-      blog = await blogService.update(blog);
-      setBlogs(blogs);  
+      await blogService.update(blog);
+      setBlogs(blogs);
     } catch (error) {
       setErrorMessage(error.response.data.message);
       setTimeout(() => setErrorMessage(null), 5000);
@@ -103,7 +99,6 @@ const App = () => {
         await blogService.remove(blog);
         setBlogs(blogs.filter(blogTmp => blogTmp.id !== blog.id));
       } catch (error) {
-        console.log('ERROR ', error.response.data.message);
         setErrorMessage(error.response.data.error);
         setTimeout(() => setErrorMessage(null), 5000);
       }
@@ -113,6 +108,7 @@ const App = () => {
   };
 
   const showLoginFormOrBlogs = () => {
+    
     if (user === null) {
       return (<Login
         username={username}
@@ -134,12 +130,12 @@ const App = () => {
           </Togglable>
 
           <Blogs blogs={blogs} 
-                 handleLikesIncrements={handleLikesIncrements} 
-                 handleRemovalOfBlog={handleRemovalOfBlog} />
+            handleLikesIncrements={handleLikesIncrements} 
+            handleRemovalOfBlog={handleRemovalOfBlog} />
         </div>
-      )
+      );
     }
-  }
+  };
 
   return (
     <>
@@ -150,6 +146,6 @@ const App = () => {
       { showLoginFormOrBlogs() }
     </>
   );
-}
+};
 
-export default App
+export default App;

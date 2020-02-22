@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
@@ -11,22 +12,22 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5
-  }
+  };
 
   const expandBlog = () => setExpanded(!expanded);
   const showWhenVisible = { display: expanded ? '' : 'none' };
 
-  const showRemoveButton = { display: blog.canRemove ? '' : 'none' }
+  const showRemoveButton = { display: blog.canRemove ? '' : 'none' };
 
   const handleLikesIncrement = () => () => {
     blog.likes += 1;
     setLikes(blog.likes);
     handleLikesIncrements(blog);
-  }
+  };
 
   const removeBlog = () => () => {
     handleRemovalOfBlog(blog);
-  }
+  };
 
   return (
     <div style={blogStyle}>
@@ -52,7 +53,13 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Blog
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired, 
+  handleLikesIncrements: PropTypes.func.isRequired, 
+  handleRemovalOfBlog: PropTypes.func.isRequired
+};
+
+export default Blog;
