@@ -97,13 +97,18 @@ const App = () => {
   };
 
   const handleRemovalOfBlog = async (blog) => {
-    try {
-      await blogService.remove(blog);
-      setBlogs(blogs.filter(blogTmp => blogTmp.id !== blog.id));
-    } catch (error) {
-      console.log('ERROR ', error.response.data.message);
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => setErrorMessage(null), 5000);
+    let removalConfirmed = window.confirm(`Are you sure you want to remove blog ${blog.title} by ${blog.author}`);
+    if (removalConfirmed) {
+      try {
+        await blogService.remove(blog);
+        setBlogs(blogs.filter(blogTmp => blogTmp.id !== blog.id));
+      } catch (error) {
+        console.log('ERROR ', error.response.data.message);
+        setErrorMessage(error.response.data.error);
+        setTimeout(() => setErrorMessage(null), 5000);
+      }
+    } else {
+      return;
     }
   };
 
