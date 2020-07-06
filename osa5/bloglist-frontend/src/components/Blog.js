@@ -31,16 +31,21 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
   return (
     <div style={blogStyle}>
-      <div onClick={expandBlog}>
+
+      <div className='title' onClick={expandBlog}>
         {blog.title}
       </div>
-      {blog.author}
-      <div style={showWhenVisible}>
-        <div>
+
+      <div className='author'>
+        {blog.author}
+      </div>
+
+      <div className='details' style={showWhenVisible}>
+        <div className='url'>
           <a href={blog.url}>{blog.url}</a>
         </div>
         <div>
-          {blog.likes} likes <button onClick={handleLikesIncrement()}>Like</button>
+          {blog.likes} likes <button className='likeButton' onClick={handleLikesIncrement()}>Like</button>
         </div>
         <div>
           {
