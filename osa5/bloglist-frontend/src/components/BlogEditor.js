@@ -20,10 +20,8 @@ const BlogEditor = ({updateView}) => {
         author: newAuthor,
         url: newUrl
       };
-      const savedBlog = await blogService
-        .create(newBlog);
+      updateView(newBlog);
 
-      updateView(savedBlog);
       setTitle('');
       setAuthor('');
       setUrl('');
@@ -43,24 +41,27 @@ const BlogEditor = ({updateView}) => {
     <form onSubmit={handleBlogSubmit}>
       <div>
         <div>
-        title
+          title
           <input 
+            id="titleField"
             type="text"
             value={newTitle}
             onChange={onChangeTitle}
           />
         </div>
         <div>
-        author
+          author
           <input 
+            id="authorField"
             type="text"
             value={newAuthor}
             onChange={onChangeAuthor}
           />
         </div>
         <div>
-        url
+          url
           <input 
+            id="urlField"
             type="text"
             value={newUrl}
             onChange={onChangeUrl}
@@ -68,7 +69,7 @@ const BlogEditor = ({updateView}) => {
         </div>
 
         <div>
-          <button type="submit">Create</button>
+          <button id="submitButton" type="submit">Create</button>
         </div>
       </div>
     </form>
