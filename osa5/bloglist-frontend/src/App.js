@@ -69,10 +69,13 @@ const App = () => {
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(null), 5000);
     } else {
+      const savedBlog = await blogService
+        .create(newBlog);
+
       blogEditorRef.current.toggleVisibility();
 
-      setBlogs(blogs.concat(newBlog));
-      const msg = 'Blog \'' + newBlog.title + '\' by ' + newBlog.author + ' was added.';
+      setBlogs(blogs.concat(savedBlog));
+      const msg = 'Blog \'' + savedBlog.title + '\' by ' + savedBlog.author + ' was added.';
 
       setSuccessMessage(msg);
       setTimeout(() => setSuccessMessage(null), 5000);
