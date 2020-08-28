@@ -15,15 +15,8 @@ const onClick = () => {
 };
 
 test('renders content', () => {
-  // const blog = {
-  //   title: 'Koiran päivät',
-  //   author: 'Kalle Päätalo',
-  //   likes: 5
-  // };
   const component = render(<SimpleBlog blog={blog}  onClick={onClick} />);
-
   expect(component.container).toHaveTextContent('Koiran päivät Kalle Päätalo');
-
   expect(component.container).toHaveTextContent('blog has 5 likes');
 });
 

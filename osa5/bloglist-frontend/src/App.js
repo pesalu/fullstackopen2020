@@ -45,9 +45,10 @@ const App = () => {
 
       // Set user with token to browsers memory
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
-
+      blogService.setToken(user.token);
+      
       let initialBlogs = await blogService.getAll();
-      blogService.enrichWithPermissions(initialBlogs, user);
+
       setBlogs(initialBlogs);
 
     } catch (error) {
@@ -122,7 +123,7 @@ const App = () => {
       );
     } else {
       return (
-        <div>
+        <div id="logged-in-message">
           <span>
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
@@ -134,7 +135,8 @@ const App = () => {
 
           <Blogs blogs={blogs} 
             handleLikesIncrements={handleLikesIncrements} 
-            handleRemovalOfBlog={handleRemovalOfBlog} />
+            handleRemovalOfBlog={handleRemovalOfBlog} 
+          />
         </div>
       );
     }

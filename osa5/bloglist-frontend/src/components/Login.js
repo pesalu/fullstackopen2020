@@ -9,6 +9,7 @@ const Login = ({
       <div>
         username
         <input
+          id="username-field"
           type="text"
           value={username}
           name="Username"
@@ -18,13 +19,14 @@ const Login = ({
       <div>
         password
         <input
+          id="password-field"
           type="password"
           value={password}
           name="Password"
           onChange={onChangePassword}
         />
       </div>
-      <button type="submit">login</button>
+      <button id="login-button" type="submit">login</button>
     </form>
   );
 };

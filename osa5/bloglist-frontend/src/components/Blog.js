@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { findAllByText } from '@testing-library/dom';
 
 const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
@@ -7,11 +8,12 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
   const [likes, setLikes] = useState('');
 
   const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: 5,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   };
 
   const expandBlog = () => setExpanded(!expanded);
@@ -32,30 +34,49 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
   return (
     <div style={blogStyle}>
 
-      <div className='title' onClick={expandBlog}>
-        {blog.title}
+      <div style={{float: 'left'}}>
+        <div 
+          id="titleText"
+          className='title'>
+          {blog.title}
+        </div>
+
+        <div 
+          id='authorText'
+          className='author'>
+          {blog.author}
+        </div>
+
+        <div className='details' style={showWhenVisible}>
+          <div className='url'>
+            <a href={blog.url}>{blog.url}</a>
+          </div>
+          <div>
+            <span id="numberOfLikesText">
+              {blog.likes} likes 
+            </span>
+            <button 
+              id='blogLikeButton'
+              className='likeButton' onClick={handleLikesIncrement()}>
+              Like
+            </button>
+          </div>
+          <div>
+            {
+              blog.user ? 'Added by user ' + blog.user.name : ''
+            }
+          </div>
+          <div style={showRemoveButton}>
+            <br />
+            <button id="blogDeletionButton" onClick={removeBlog()}>Remove</button>
+          </div>
+        </div>
       </div>
 
-      <div className='author'>
-        {blog.author}
-      </div>
-
-      <div className='details' style={showWhenVisible}>
-        <div className='url'>
-          <a href={blog.url}>{blog.url}</a>
-        </div>
-        <div>
-          {blog.likes} likes <button className='likeButton' onClick={handleLikesIncrement()}>Like</button>
-        </div>
-        <div>
-          {
-            blog.user ? 'Added by user ' + blog.user.name : ''
-          }
-        </div>
-        <div style={showRemoveButton}>
-          <br />
-          <button onClick={removeBlog()}>Remove</button>
-        </div>
+      <div style={{textAlign: 'right'}}>
+        <button id="showDetailsButton" onClick={expandBlog}>
+          {!expanded ? 'Show details' : 'Hide details'}
+        </button>
       </div>
     </div>
   );
