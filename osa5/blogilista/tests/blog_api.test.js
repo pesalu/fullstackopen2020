@@ -82,12 +82,14 @@ test('blogs are returned as json', async () => {
 });
 
 test('all blogs are returned', async () => {
-  let response = await api.get('/api/blogs');
+  let response = await api
+    .get('/api/blogs')
   expect(response.body.length).toBe(initialBlogs.length);
 });
 
 test('the identifying field of blog is \'id\' ', async () => {
-  const response = await api.get('/api/blogs');
+  const response = await api
+    .get('/api/blogs')
   expect(response.body[0].id).toBeDefined();
 });
 
@@ -101,7 +103,6 @@ test('a valid blog can be added ', async () => {
 
   // Login first
   const token = await loginBy(user1);
-
   await api
     .post('/api/blogs')
     .set('Authorization', 'Bearer ' + token)
@@ -117,6 +118,19 @@ test('a valid blog can be added ', async () => {
   expect(blogTitles).toContain(
     'Liisa Karjalassa'
   );
+});
+
+test('adding blog by non-registered user fails ', async () => {
+  const testBlog = {
+    'title': 'Liisa Karjalassa',
+    'author': 'Pekka von Puurtimo',
+    'url': 'test.fi/1',
+    'likes': 0
+  };
+  await api
+    .post('/api/blogs')
+    .send(testBlog)
+    .expect(500);
 });
 
 test('set the value of \'likes\' in a blog to zero by default', async () => {

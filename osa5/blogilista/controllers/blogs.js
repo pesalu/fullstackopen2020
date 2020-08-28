@@ -8,8 +8,19 @@ const User = require('../models/user');
 notesRouter.get('/', async (request, response) => {
   try {
     const blogs = await Blog
-      .find({}).populate('user', { username: 1, name: 1 });
-    response.json(blogs.map(blog => blog.toJSON()));
+      .find({})
+      .lean()
+      .populate('user', { username: 1, name: 1 })
+      .map(blogs => {
+        procBlogs = blogs.map(blog => processBlog(blog));
+        return procBlogs;
+      });
+
+    const user = await getRequester(request);
+
+    let blogs2 = enrichWithPermissionsOfBlogs(blogs, user);
+
+    response.json(blogs2);
   } catch (error) {
     next(error);
   }
@@ -31,9 +42,7 @@ notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
 
   try {
-    const decodedToken = getDecodedToken(request);
-
-    const user = await User.findById(decodedToken.id);
+    const user = await getRequester(request);
 
     const newBlog = new Blog({
       title: blog.title,
@@ -47,20 +56,67 @@ notesRouter.post('/', async (request, response, next) => {
     user.blogs = user.blogs.concat(savedBlog._id);
     await user.save();
 
-    response.status(201).json(savedBlog);
+    let newSavedBlog = await Blog.findById(savedBlog._id)
+      .lean()
+      .populate('user', { username: 1, name: 1 })
+      .map(blog => processBlog(blog));
+
+    newSavedBlog = enrichWithPermissions(newSavedBlog, user);
+    response.status(201).json(newSavedBlog);
   } catch (error) {
     next(error);
   }
 
 });
 
-const getDecodedToken = (request) => {
-  const decodedToken = jwt.verify(request.token, config.SECRET);
-
-  if (!request.token || !decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' })
+const enrichWithPermissionsOfBlogs = (blogs, user) => {
+  if (!user) {
+    console.log('User is not defined. Cannot do permission enriching.')
+    return blogs;
   }
-  return decodedToken;
+  return blogs.map(blog => {
+    return enrichWithPermissions(blog, user);
+  });
+};
+
+const enrichWithPermissions = (blog, user) => {
+  blog.canRemove = (blog.user ? (blog.user.username === user.username) : false);
+  return blog;
+};
+
+function processBlog(blog) {
+  delete blog.__v;
+  blog.id = blog._id;
+  delete blog._id;
+  return blog;
+}
+
+async function getRequester(request) {
+  if (!request.token) {
+    console.log('Request has no token, cannot do decoding. Return null.')
+    return null;
+  }
+  const decodedToken = await getDecodedToken(request);
+  const user = await User.findById(decodedToken.id);
+  return user;
+}
+
+async function getDecodedToken(request) {
+  try {
+    let decodedToken = null;
+    if(request.token) {
+      decodedToken = await jwt.verify(request.token, config.SECRET);
+    } else {
+      return null;
+    }
+
+    if (!request.token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    return decodedToken;
+  } catch( error ) {
+    console.log('getDecodedToken ERROR ', error);
+  }
 }
 
 notesRouter.put('/:id', async (request, response, next) => {
@@ -84,7 +140,7 @@ notesRouter.put('/:id', async (request, response, next) => {
 
 notesRouter.delete('/:id', async (request, response, next) => {
   try {
-    const decodedToken = getDecodedToken(request);
+    const decodedToken = await getDecodedToken(request);
     const blogToBeRemoved = await Blog.findById(request.params.id);
 
     if (blogToBeRemoved && blogToBeRemoved.user && blogToBeRemoved.user.toString() === decodedToken.id) {

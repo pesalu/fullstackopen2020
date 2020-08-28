@@ -10,7 +10,9 @@ const middleware = require('./utils/middleware');
 
 const app = express();
 
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true });
+mongoose.connect(config.MONGODB_URI, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true });
 
 app.use(cors());
 app.use(express.static('build'));
@@ -23,6 +25,11 @@ app.use(middleware.addTokenToFromAuthorizationHeaderRequest);
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
+
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/router-for-e2e-tests');
+  app.use('/api/testing', testingRouter);
+}
 
 // Middlewares after routes
 app.use(middleware.errorHandler);
