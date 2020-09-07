@@ -23,24 +23,22 @@ const reducer = (state = initialState, action) => {
   console.log('state now: ', state)
   console.log('action', action)
 
+
   switch(action.type) {
     case 'VOTE':
-      let state2 = state.map(anec => {
+      return state.map(anec => {
         if (anec.id === action.data.id) {
           anec.votes += 1;
         };
-        console.log('ANEC ', anec)
         return anec;
-      })
-      console.log('VOTE!! ', state2);
-      return state2;
+      });
     case 'CREATE':
       return [...state, action.data];
     default: return state;
   }
 }
 
-export const createNote = (anecdoteText) => {
+export const createAndecdote = (anecdoteText) => {
   return {
     type: 'CREATE',
     data: asObject(anecdoteText)
