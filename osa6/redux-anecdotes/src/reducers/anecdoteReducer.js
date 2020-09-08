@@ -1,3 +1,5 @@
+import { combineReducers } from 'redux';
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -17,12 +19,12 @@ const asObject = (anecdote) => {
   }
 }
 
-const initialState = anecdotesAtStart.map(asObject)
+const initialAnecdotes = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
+// REDUCERS
+export const anecdoteReducer = (state = initialAnecdotes, action) => {
   console.log('state now: ', state)
   console.log('action', action)
-
 
   switch(action.type) {
     case 'VOTE':
@@ -38,6 +40,26 @@ const reducer = (state = initialState, action) => {
   }
 }
 
+export const notificationReducer = (state = 'ANECDOTE_VOTED', action) => {
+  console.log('STATE ', state, action);
+
+  switch(action.type) {
+    case 'ANECDOTE_VOTED':
+      return action.notificationText;
+    case 'ANECDOTE_CREATED':
+      return action.notificationText;
+    default:
+      return state;
+  }
+}
+
+const reducer = combineReducers({
+  anecdotes: anecdoteReducer,
+  notification: notificationReducer
+});
+
+
+// ACTION CREATORS
 export const createAndecdote = (anecdoteText) => {
   return {
     type: 'CREATE',
@@ -53,5 +75,12 @@ export const vote = (id) => {
     data: { id }
   }
 };
+
+export const createNotification = (notificationType, notificationText) => {
+  return {
+    type: notificationType,
+    notificationText: notificationText
+  }
+}
 
 export default reducer
