@@ -1,19 +1,29 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearNotification } from '../reducers/anecdoteReducer';
 
-const Notification = () => {
+const Notification = ({maxTimeVisible}) => {
   const notification = useSelector(state => state.notification);
+  const dispatch = useDispatch();
 
-  const style = {
+  let style = {
     border: 'solid',
     padding: 10,
-    borderWidth: 1
+    borderWidth: 1,
+    visibility: 'visible'
   }
-  return (
-    <div style={style}>
-      {notification}
-    </div>
-  )
+
+  if (maxTimeVisible && notification) {
+    setTimeout(() => dispatch(clearNotification()), maxTimeVisible);
+  }
+
+  if (notification) {
+    return (
+      <div style={style}>{notification}</div>
+    );
+  }
+  return null;
+
 }
 
 export default Notification

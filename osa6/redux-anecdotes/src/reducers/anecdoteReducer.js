@@ -23,8 +23,6 @@ const initialAnecdotes = anecdotesAtStart.map(asObject)
 
 // REDUCERS
 export const anecdoteReducer = (state = initialAnecdotes, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
 
   switch(action.type) {
     case 'VOTE':
@@ -40,14 +38,14 @@ export const anecdoteReducer = (state = initialAnecdotes, action) => {
   }
 }
 
-export const notificationReducer = (state = 'ANECDOTE_VOTED', action) => {
-  console.log('STATE ', state, action);
-
+export const notificationReducer = (state = null, action) => {
   switch(action.type) {
     case 'ANECDOTE_VOTED':
       return action.notificationText;
     case 'ANECDOTE_CREATED':
       return action.notificationText;
+    case 'CLEAR_NOTIFICATION':
+      return null;
     default:
       return state;
   }
@@ -68,8 +66,6 @@ export const createAndecdote = (anecdoteText) => {
 }
 
 export const vote = (id) => {
-  console.log('vote', id)
-
   return {
     type: 'VOTE',
     data: { id }
@@ -80,6 +76,12 @@ export const createNotification = (notificationType, notificationText) => {
   return {
     type: notificationType,
     notificationText: notificationText
+  }
+}
+
+export const clearNotification = () => {
+  return {
+    type: 'CLEAR_NOTIFICATION',
   }
 }
 
