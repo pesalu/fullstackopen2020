@@ -1,5 +1,3 @@
-import { combineReducers } from 'redux';
-
 export const filterReducer = (state = null, action) => {
   switch(action.type) {
     case 'FILTER':

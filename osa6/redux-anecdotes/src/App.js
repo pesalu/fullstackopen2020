@@ -5,17 +5,18 @@ import Notification from './components/Notification';
 import TextFilter from './components/TextFilter';
 
 import {useDispatch} from 'react-redux';
-import anecdoteService from './services/anecdotes';
 import {initializeAnecdotes} from './reducers/anecdoteReducer';
 
 const App = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    anecdoteService.getAll().then(
-      anecdotes => dispatch(initializeAnecdotes(anecdotes))
-    );
-  }, [dispatch]);
+  // useEffect(() => {
+  //   anecdoteService.getAll().then(
+  //     anecdotes => dispatch(initializeAnecdotes(anecdotes))
+  //   );
+  // }, [dispatch]);
+
+  useEffect(() => { dispatch(initializeAnecdotes()) },[dispatch]) ;
 
   return (
     <div>

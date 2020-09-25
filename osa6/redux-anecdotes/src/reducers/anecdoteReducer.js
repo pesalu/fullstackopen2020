@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import anecdotesService from '../services/anecdotes';
 
 const anecdotesAtStart = [
   'If it hurts, do it more often',
@@ -23,15 +24,9 @@ const initialAnecdotes = anecdotesAtStart.map(asObject)
 
 // REDUCERS
 export const anecdoteReducer = (state = [], action) => {
-
   switch(action.type) {
     case 'VOTE':
-      return state.map(anec => {
-        if (anec.id === action.data.id) {
-          anec.votes += 1;
-        };
-        return anec;
-      });
+      return [...state];
     case 'CREATE':
       return [...state, action.data];
     case 'INIT_ANECDOTES':
@@ -62,32 +57,50 @@ const reducer = combineReducers({
 
 // ACTION CREATORS
 export const createAndecdote = (data) => {
-  return {
-    type: 'CREATE',
-    data
+  return async dispatch => {
+    const newAnecdote = await anecdotesService.createNew(data);
+    dispatch({
+      type: 'CREATE',
+      data: newAnecdote
+    });
   }
 }
 
-export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: 'INIT_ANECDOTES',
-    data: anecdotes
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdotesService.getAll();
+    dispatch({
+      type: 'INIT_ANECDOTES',
+      data: anecdotes
+    })
   }
 }
 
-export const vote = (id) => {
-  return {
-    type: 'VOTE',
-    data: { id }
+export const vote = (anecdote) => {
+  return async dispatch => {
+    const updatedAnecdote = await anecdotesService.voteAnecdote(anecdote);
+    dispatch({
+      type: 'VOTE',
+      data: { id: updatedAnecdote.id, }
+    });
   }
 };
 
-export const createNotification = (notificationType, notificationText) => {
-  return {
-    type: notificationType,
-    notificationText: notificationText
+export const createNotification = (notificationType, notificationText, showTime) => {
+  return async dispatch => {
+    dispatch({
+      type: notificationType,
+      notificationText: notificationText
+    });
+    setTimeout(() => {
+      dispatch({
+        type: 'CLEAR_NOTIFICATION',
+      })
+    },
+    showTime);
   }
 }
+
 
 export const clearNotification = () => {
   return {

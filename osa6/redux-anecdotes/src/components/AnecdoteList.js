@@ -13,9 +13,9 @@ const Anecdotes = () => {
   });
   const dispatch = useDispatch();
 
-  const voteAnecdote = (anecdoteId, content) => {
-    dispatch(vote(anecdoteId));
-    dispatch(createNotification('ANECDOTE_VOTED', 'You\'ve voted \'' + content + '\'!'));
+  const voteAnecdote = (anecdote) => {
+    dispatch(vote(anecdote));
+    dispatch(createNotification('ANECDOTE_VOTED', 'You\'ve voted \'' + anecdote.content + '\'!', 3000));
   };
 
   const byVotesDesc = (anecdote1, anecdote2) => anecdote2.votes - anecdote1.votes;
@@ -30,7 +30,8 @@ const Anecdotes = () => {
           </div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => voteAnecdote(anecdote.id, anecdote.content)}>vote</button>
+            {/* <button onClick={() => voteAnecdote(anecdote.id, anecdote.content)}>vote</button> */}
+            <button onClick={() => voteAnecdote(anecdote)}>vote</button>
           </div>
         </div>
       )}
