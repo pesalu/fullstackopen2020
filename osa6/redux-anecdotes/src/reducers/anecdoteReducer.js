@@ -39,15 +39,25 @@ export const anecdoteReducer = (state = [], action) => {
 export const notificationReducer = (state = null, action) => {
   switch(action.type) {
     case 'ANECDOTE_VOTED':
-      return action.notificationText;
+      clearTimeoutOfPreviousNotification(state, action);
+      return {notifId: action.notifId, notification: action.notificationText};
     case 'ANECDOTE_CREATED':
-      return action.notificationText;
+      clearTimeoutOfPreviousNotification(state, action);
+      return {notifId: action.notifId, notification: action.notificationText};
     case 'CLEAR_NOTIFICATION':
       return null;
     default:
       return state;
   }
 }
+
+const clearTimeoutOfPreviousNotification = (state, action) => {
+  if (state && state.notifId !== action.notifId) {
+    console.log('CLEARING  ', state.notifId);
+    clearTimeout(state.notifId);
+  }
+}
+
 
 const reducer = combineReducers({
   anecdotes: anecdoteReducer,
@@ -88,16 +98,20 @@ export const vote = (anecdote) => {
 
 export const createNotification = (notificationType, notificationText, showTime) => {
   return async dispatch => {
-    dispatch({
-      type: notificationType,
-      notificationText: notificationText
-    });
-    setTimeout(() => {
+
+    let notifTimeoutId = setTimeout(() => {
       dispatch({
         type: 'CLEAR_NOTIFICATION',
       })
     },
     showTime);
+
+    dispatch({
+      notifId: notifTimeoutId,
+      type: notificationType,
+      notificationText: notificationText
+    });
+
   }
 }
 
