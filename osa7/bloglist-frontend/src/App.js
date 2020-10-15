@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import { createNotification } from './reducers/notificationReducer';
 import { initialize, create, like, remove } from './reducers/blogReducer';
+import { login, logout } from './reducers/loginReducer';
 
 
 const App = () => {
@@ -17,9 +18,10 @@ const App = () => {
 
   let blogs = useSelector( state => !!state.blogs ? state.blogs : [] );
 
+  let user = useSelector( state => !!state.user ? state.user : null );
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -27,33 +29,22 @@ const App = () => {
 
   useEffect(() => {
     dispatch( initialize() );
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedInUserJSON = window.localStorage.getItem('loggedBloglistUser');
     if (loggedInUserJSON) {
       const user = JSON.parse(loggedInUserJSON);
-      setUser(user);
       blogService.setToken(user.token);
       dispatch( initialize() );
     }
-  }, [blogs]);
+  }, [dispatch]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
     const credentials = {username, password};
     try {
-      const user = await loginService.login(credentials);
-
-      setUser(user);
-      setUsername('');
-      setPassword('');
-
-
-      // Set user with token to browsers memory
-      window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
-      blogService.setToken(user.token);
-      dispatch( initialize() );
+      dispatch( login(credentials) );
     } catch (error) {
       setErrorMessage('Wrong credentials');
       setTimeout(() => setErrorMessage(null), 5000);
@@ -61,9 +52,9 @@ const App = () => {
   };
 
   const handleLogout = async () => {
-    setUser(null);
     setUsername('');
     setPassword('');
+    dispatch( logout() );
     window.localStorage.removeItem('loggedBloglistUser');
   };
 
