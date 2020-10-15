@@ -6,28 +6,27 @@ import BlogEditor from './components/BlogEditor';
 import Login from './components/Login';
 import Notification from './components/Notification';
 import Togglable from './components/logical/Togglable';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import { createNotification } from './reducers/notificationReducer';
+import { initialize, create, like, remove } from './reducers/blogReducer';
 
 
 const App = () => {
   const dispatch = useDispatch();
 
-  const [blogs, setBlogs] = useState([]);
+  let blogs = useSelector( state => !!state.blogs ? state.blogs : [] );
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
-  const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const blogEditorRef = React.createRef();
 
   useEffect(() => {
-    blogService
-      .getAll()
-      .then(initialBlogs => setBlogs(initialBlogs));
+    dispatch( initialize() );
   }, []);
 
   useEffect(() => {
@@ -36,6 +35,7 @@ const App = () => {
       const user = JSON.parse(loggedInUserJSON);
       setUser(user);
       blogService.setToken(user.token);
+      dispatch( initialize() );
     }
   }, [blogs]);
 
@@ -49,14 +49,11 @@ const App = () => {
       setUsername('');
       setPassword('');
 
+
       // Set user with token to browsers memory
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
       blogService.setToken(user.token);
-      
-      let initialBlogs = await blogService.getAll();
-
-      setBlogs(initialBlogs);
-
+      dispatch( initialize() );
     } catch (error) {
       setErrorMessage('Wrong credentials');
       setTimeout(() => setErrorMessage(null), 5000);
@@ -71,18 +68,13 @@ const App = () => {
   };
 
   const updateView = async (newBlog, message) => {
-
     if (!newBlog) {
       setErrorMessage(message);
       setTimeout(() => setErrorMessage(null), 5000);
     } else {
-      const savedBlog = await blogService
-        .create(newBlog);
-      dispatch( createNotification('BLOG_CREATED', `Blog '${savedBlog.title}' created by ${savedBlog.author}`, 5000) );
-
+      dispatch( create(newBlog) );
+      dispatch( createNotification('BLOG_CREATED', `Blog '${newBlog.title}' created by ${newBlog.author}`, 5000) );
       blogEditorRef.current.toggleVisibility();
-
-      setBlogs(blogs.concat(savedBlog));
     }
   };
 
@@ -91,9 +83,8 @@ const App = () => {
 
   const handleLikesIncrements = async (blog) => {
     try {
-      await blogService.update(blog);
+      dispatch( like(blog) );
       dispatch( createNotification('BLOG_LIKED', `Blogia '${blog.title}' tykätty`, 5000) );
-      setBlogs(blogs);
     } catch (error) {
       setErrorMessage(error.response.data.message);
       setTimeout(() => setErrorMessage(null), 5000);
@@ -104,9 +95,8 @@ const App = () => {
     let removalConfirmed = window.confirm(`Are you sure you want to remove blog ${blog.title} by ${blog.author}`);
     if (removalConfirmed) {
       try {
-        await blogService.remove(blog);
+        dispatch( remove(blog) );
         dispatch( createNotification('BLOG_REMOVED', `Blog ${blog.title} removed.`, 5000) );
-        setBlogs(blogs.filter(blogTmp => blogTmp.id !== blog.id));
       } catch (error) {
         setErrorMessage(error.response.data.error);
         setTimeout(() => setErrorMessage(null), 5000);
@@ -134,7 +124,10 @@ const App = () => {
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
 
-          <Togglable buttonLabel="New blog" ref={blogEditorRef}>
+          <Togglable 
+            buttonLabel="New blog" 
+            ref={blogEditorRef}
+          >
             <BlogEditor updateView={updateView} />
           </Togglable>
 
