@@ -1,0 +1,10 @@
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBlZHJva2FzIiwiaWQiOiI1ZTI0NGE0ZmM4ZmM3NzgxOWZiMjZmMjkiLCJpYXQiOjE1Nzk0NDAwODd9.5IfGCwiLpvns_0JCvz0hNXWpUAp7D2Ao57D-pGSQE44
+
+{
+  "title": "Python 7",
+  "author": "Petri L.",
+  "url": "python.com",
+  "likes": 1
+}
