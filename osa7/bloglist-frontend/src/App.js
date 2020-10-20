@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Switch, Route, Link
+} from "react-router-dom"
+
+// Services
 import loginService from './services/login';
 import blogService from './services/blogs';
+
+// Components
 import Blogs from './components/Blogs';
 import BlogEditor from './components/BlogEditor';
 import Login from './components/Login';
 import Notification from './components/Notification';
 import Togglable from './components/logical/Togglable';
-import {useDispatch, useSelector} from 'react-redux';
+import { Users } from './components/Users';
 
+// Redux
+import {useDispatch, useSelector} from 'react-redux';
 import { createNotification } from './reducers/notificationReducer';
 import { initialize, create, like, remove } from './reducers/blogReducer';
+import { initializeUsers } from './reducers/userReducer';
 import { login, logout } from './reducers/loginReducer';
 
 
@@ -17,24 +28,22 @@ const App = () => {
   const dispatch = useDispatch();
 
   let blogs = useSelector( state => !!state.blogs ? state.blogs : [] );
+  let user = useSelector( state => !!state.user ? state.user : JSON.parse(window.localStorage.getItem('loggedBloglistUser')) );
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  let user = useSelector( state => !!state.user ? state.user : null );
+  let users = useSelector( state => !!state.users ? state.users : [] );
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const [errorMessage, setErrorMessage] = useState(null);
-
   const blogEditorRef = React.createRef();
 
   useEffect(() => {
-    dispatch( initialize() );
-  }, [dispatch]);
+    let loggedInUserJSON = window.localStorage.getItem('loggedBloglistUser');
+    user = !!loggedInUserJSON ? JSON.parse(loggedInUserJSON) : null;
+    console.log('USER JSON ', user)
 
-  useEffect(() => {
-    const loggedInUserJSON = window.localStorage.getItem('loggedBloglistUser');
-    if (loggedInUserJSON) {
-      const user = JSON.parse(loggedInUserJSON);
+    if (user) {
       blogService.setToken(user.token);
       dispatch( initialize() );
     }
@@ -42,9 +51,9 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const credentials = {username, password};
+    const credentials = { username, password };
     try {
-      dispatch( login(credentials) );
+      dispatch(login(credentials));
     } catch (error) {
       setErrorMessage('Wrong credentials');
       setTimeout(() => setErrorMessage(null), 5000);
@@ -97,8 +106,8 @@ const App = () => {
     }
   };
 
-  const showLoginFormOrBlogs = () => {
-
+  const showLoginFormOrBlogs = (user) => {
+    console.log('USER ', user)
     if (user === null) {
       return (<Login
         username={username}
@@ -109,24 +118,36 @@ const App = () => {
       );
     } else {
       return (
-        <div id="logged-in-message">
-          <span>
-            {user.name} logged in 
-            <button type="submit" onClick={handleLogout}>logout</button>
-          </span>
-
-          <Togglable 
-            buttonLabel="New blog" 
-            ref={blogEditorRef}
-          >
-            <BlogEditor updateView={updateView} />
-          </Togglable>
-
-          <Blogs blogs={blogs} 
-            handleLikesIncrements={handleLikesIncrements} 
-            handleRemovalOfBlog={handleRemovalOfBlog} 
-          />
-        </div>
+      <Router>
+          
+          <div id="logged-in-message">
+            <span>
+              {user.name} logged in 
+              <button type="submit" onClick={handleLogout}>logout</button>
+            </span>
+        
+            <Switch>
+              <Route path="/users">
+                <Users users={users} />
+              </Route>
+              
+              <Route path="/">
+                <Togglable 
+                    buttonLabel="New blog" 
+                    ref={blogEditorRef}
+                  >
+                  <BlogEditor updateView={updateView} />
+                </Togglable>
+                <Blogs blogs={blogs} 
+                  handleLikesIncrements={handleLikesIncrements} 
+                  handleRemovalOfBlog={handleRemovalOfBlog} 
+                />
+              </Route>
+            </Switch>
+          </div>
+        
+        
+      </Router>
       );
     }
   };
@@ -135,7 +156,7 @@ const App = () => {
     <>
       <h1>Blogit</h1>
       <Notification />
-      { showLoginFormOrBlogs() }
+      { showLoginFormOrBlogs(user) }
     </>
   );
 };

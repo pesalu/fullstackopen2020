@@ -60,4 +60,6 @@ const enrichWithPermissions = (blogs, user) => {
   });
 };
 
-export default { getAll, setToken, create, update, remove, enrichWithPermissions };
+export const getToken = () => token;
+
+export default { getAll, setToken, getToken, create, update, remove, enrichWithPermissions };

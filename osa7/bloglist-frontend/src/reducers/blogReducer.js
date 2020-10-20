@@ -1,5 +1,5 @@
 import blogService from '../services/blogs';
-
+import { initializeUsers } from './userReducer'
 export const blogReducer = (state = [], action) => {
   switch(action.type) {
     case 'LIKE':
@@ -45,6 +45,7 @@ export const initialize = () => {
       type: 'INIT',
       data: blogs
     })
+    dispatch( initializeUsers() );
   }
 }
 
