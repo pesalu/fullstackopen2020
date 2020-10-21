@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
-  Switch, Route, Link
+  Switch, Route, Link, 
+  useRouteMatch
 } from "react-router-dom"
 
 // Services
@@ -15,6 +16,8 @@ import Login from './components/Login';
 import Notification from './components/Notification';
 import Togglable from './components/logical/Togglable';
 import { Users } from './components/Users';
+import { User } from './components/User';
+import BlogDetails from './components/BlogDetails';
 
 // Redux
 import {useDispatch, useSelector} from 'react-redux';
@@ -29,20 +32,24 @@ const App = () => {
 
   let blogs = useSelector( state => !!state.blogs ? state.blogs : [] );
   let user = useSelector( state => !!state.user ? state.user : JSON.parse(window.localStorage.getItem('loggedBloglistUser')) );
+
   const [errorMessage, setErrorMessage] = useState(null);
 
   let users = useSelector( state => !!state.users ? state.users : [] );
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const blogEditorRef = React.createRef();
 
-  useEffect(() => {
-    let loggedInUserJSON = window.localStorage.getItem('loggedBloglistUser');
-    user = !!loggedInUserJSON ? JSON.parse(loggedInUserJSON) : null;
-    console.log('USER JSON ', user)
+  const urlUserId = useRouteMatch('/users/:id');
+  const blogUrlObj = useRouteMatch('/blogs/:id');
+  const urlBlogId = !!blogUrlObj ? blogUrlObj.params.id : null;
 
+  const selectedUser = urlUserId && users ? users.find(otherUser => otherUser.id === urlUserId.params.id) : null;
+
+  // const selectedBlog = !!urlBlogId && !!blogs.length ? blogs.find(blog => blog.id === urlBlogId.params.id) : null;
+
+  useEffect(() => {
     if (user) {
       blogService.setToken(user.token);
       dispatch( initialize() );
@@ -107,7 +114,6 @@ const App = () => {
   };
 
   const showLoginFormOrBlogs = (user) => {
-    console.log('USER ', user)
     if (user === null) {
       return (<Login
         username={username}
@@ -118,36 +124,35 @@ const App = () => {
       );
     } else {
       return (
-      <Router>
-          
-          <div id="logged-in-message">
-            <span>
-              {user.name} logged in 
-              <button type="submit" onClick={handleLogout}>logout</button>
-            </span>
-        
-            <Switch>
-              <Route path="/users">
-                <Users users={users} />
-              </Route>
-              
-              <Route path="/">
-                <Togglable 
-                    buttonLabel="New blog" 
-                    ref={blogEditorRef}
-                  >
-                  <BlogEditor updateView={updateView} />
-                </Togglable>
-                <Blogs blogs={blogs} 
-                  handleLikesIncrements={handleLikesIncrements} 
-                  handleRemovalOfBlog={handleRemovalOfBlog} 
-                />
-              </Route>
-            </Switch>
-          </div>
-        
-        
-      </Router>
+        <div id="logged-in-message">
+          <span>
+            {user.name} logged in 
+            <button type="submit" onClick={handleLogout}>logout</button>
+          </span>
+          <Switch>
+            <Route path="/users/:id">
+              <User user={selectedUser} />
+            </Route>
+            <Route path="/users">
+              <Users users={users} />
+            </Route>
+            <Route path="/blogs/:id">
+              <BlogDetails blogId={urlBlogId} handleLikesIncrements={handleLikesIncrements} />
+            </Route>
+            <Route path="/blogs">
+              <Togglable 
+                  buttonLabel="New blog" 
+                  ref={blogEditorRef}
+                >
+                <BlogEditor updateView={updateView} />
+              </Togglable>
+              <Blogs blogs={blogs} 
+                handleLikesIncrements={handleLikesIncrements} 
+                handleRemovalOfBlog={handleRemovalOfBlog} 
+              />
+            </Route>
+          </Switch>
+        </div>
       );
     }
   };

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { findAllByText } from '@testing-library/dom';
+import { Link } from 'react-router-dom';
 
-const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
+
+const BlogListItem = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
   const [expanded, setExpanded] = useState('');
   const [likes, setLikes] = useState('');
@@ -22,7 +24,6 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
   const showRemoveButton = { display: blog.canRemove ? '' : 'none' };
 
   const handleLikesIncrement = () => () => {
-    blog.likes += 1;
     setLikes(blog.likes);
     handleLikesIncrements(blog);
   };
@@ -35,11 +36,13 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
     <div style={blogStyle}>
 
       <div style={{float: 'left'}}>
-        <div 
-          id="titleText"
-          className='title'>
-          {blog.title}
-        </div>
+        <Link to={`/blogs/${blog.id}`}>
+          <div 
+            id="titleText"
+            className='title'>
+            {blog.title}
+          </div>
+        </Link>
 
         <div 
           id='authorText'
@@ -82,10 +85,10 @@ const Blog = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
   );
 };
 
-Blog.propTypes = {
+BlogListItem.propTypes = {
   blog: PropTypes.object.isRequired, 
   handleLikesIncrements: PropTypes.func.isRequired, 
   handleRemovalOfBlog: PropTypes.func.isRequired
 };
 
-export default Blog;
+export default BlogListItem;

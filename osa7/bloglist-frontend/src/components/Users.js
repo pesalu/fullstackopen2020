@@ -1,18 +1,26 @@
 import React from 'react';
 
+import {
+    Link
+} from 'react-router-dom';
+
 export const Users = ({users}) => { 
     const getTableOfUsers = (users) => {
         return users.map(user => 
-            <tr>
-                <td><a>{user.name}es</a></td>
+            <tr key={user.id}>
+                <td>
+                    <Link to={`/users/${user.id}`}>
+                        {user.name}
+                    </Link>
+                </td>
                 <td>{!!user.blogs ? user.blogs.length : 0}</td>
             </tr>
         );
     };
     return (
-        <div>
+        <>
             <h3>Users</h3>
             <table>{getTableOfUsers(users)}</table>
-        </div>
+        </>
     );
 };
