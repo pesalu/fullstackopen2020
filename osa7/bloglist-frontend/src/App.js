@@ -18,6 +18,7 @@ import Togglable from './components/logical/Togglable';
 import { Users } from './components/Users';
 import { User } from './components/User';
 import BlogDetails from './components/BlogDetails';
+import NavigationBar from './components/NavigationBar';
 
 // Redux
 import {useDispatch, useSelector} from 'react-redux';
@@ -129,6 +130,8 @@ const App = () => {
             {user.name} logged in 
             <button type="submit" onClick={handleLogout}>logout</button>
           </span>
+          <NavigationBar user={user} handleLogout={handleLogout}/>
+          <h1>Blogit</h1>
           <Switch>
             <Route path="/users/:id">
               <User user={selectedUser} />
@@ -159,7 +162,6 @@ const App = () => {
 
   return (
     <>
-      <h1>Blogit</h1>
       <Notification />
       { showLoginFormOrBlogs(user) }
     </>
