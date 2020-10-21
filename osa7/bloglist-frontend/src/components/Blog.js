@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { findAllByText } from '@testing-library/dom';
 import { Link } from 'react-router-dom';
 
+import {Button} from '@material-ui/core'
 
 const BlogListItem = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
 
@@ -12,10 +13,6 @@ const BlogListItem = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
   const blogStyle = {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: 5,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
   };
 
   const expandBlog = () => setExpanded(!expanded);
@@ -50,36 +47,44 @@ const BlogListItem = ({ blog, handleLikesIncrements, handleRemovalOfBlog }) => {
           {blog.author}
         </div>
 
+
+
         <div className='details' style={showWhenVisible}>
-          <div className='url'>
-            <a href={blog.url}>{blog.url}</a>
-          </div>
-          <div>
-            <span id="numberOfLikesText">
-              {blog.likes} likes 
-            </span>
-            <button 
-              id='blogLikeButton'
-              className='likeButton' onClick={handleLikesIncrement()}>
-              Like
-            </button>
-          </div>
           <div>
             {
               blog.user ? 'Added by user ' + blog.user.name : ''
             }
           </div>
+          <div className='url'>
+            <a href={blog.url}>{blog.url}</a>
+          </div>
+          <div>
+            <div id="numberOfLikesText">
+              {blog.likes} likes  
+            </div>
+            <Button 
+              id='blogLikeButton'
+              className='likeButton' onClick={handleLikesIncrement()}
+              color="primary"
+              variant="contained"
+              >
+              Like
+            </Button>
+          </div>
+
           <div style={showRemoveButton}>
             <br />
-            <button id="blogDeletionButton" onClick={removeBlog()}>Remove</button>
+            <Button id="blogDeletionButton" onClick={removeBlog()}>
+              Remove
+            </Button>
           </div>
         </div>
       </div>
 
       <div style={{textAlign: 'right'}}>
-        <button id="showDetailsButton" onClick={expandBlog}>
+        <Button id="showDetailsButton" onClick={expandBlog}>
           {!expanded ? 'Show details' : 'Hide details'}
-        </button>
+        </Button>
       </div>
     </div>
   );

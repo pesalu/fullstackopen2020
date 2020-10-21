@@ -1,32 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {TextField, Button} from '@material-ui/core'
 
 const Login = ({ 
   username, password, onSubmit, onChangeUsername, onChangePassword }) => {
   return (
     <form onSubmit = { onSubmit }>
+      <h1>Login</h1>
       <div>
-        username
-        <input
-          id="username-field"
-          type="text"
+        {/* <h6>Username</h6> */}
+        <TextField 
+          id="username-field" 
+          label="username" 
+          name="Username" 
           value={username}
-          name="Username"
           onChange={onChangeUsername}
-        />
+          />
       </div>
       <div>
-        password
-        <input
-          id="password-field"
-          type="password"
+        <TextField 
+          id="password-field" 
+          label="password" 
+          name="Password" 
           value={password}
-          name="Password"
           onChange={onChangePassword}
         />
       </div>
-      <button id="login-button" type="submit">login</button>
+      <br/>
+      <Button variant="contained" color="primary" type="submit">Login</Button>
     </form>
   );
 };
