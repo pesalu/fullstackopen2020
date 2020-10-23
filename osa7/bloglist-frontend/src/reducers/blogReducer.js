@@ -1,8 +1,13 @@
 import blogService from '../services/blogs';
 import { initializeUsers } from './userReducer'
+
+import { createNotification } from './notificationReducer';
+
 export const blogReducer = (state = [], action) => {
   switch(action.type) {
     case 'LIKE':
+      return [...state];
+    case 'COMMENT':
       return [...state];
     case 'CREATE':
       let newBlog = action.data;
@@ -59,3 +64,14 @@ export const like = (blog) => {
     });
   }
 };
+
+export const comment = (blog, comment) => {
+  return async dispatch => {
+    const updatedBlog = await blogService.comment(blog.id, comment);
+    dispatch( createNotification('BLOG_COMMENTED', `Blogia '${updatedBlog.title}' kommentoitu`, 5000) );
+    dispatch({
+      type: 'COMMENT',
+      data: { id: updatedBlog.id }
+    });
+  }
+}

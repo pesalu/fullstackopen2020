@@ -42,6 +42,17 @@ const update = async (blog) => {
   return response.data;
 };
 
+const comment = async (blogId, comment) => {
+  const config = {
+    headers: { Authorization: token }
+  };
+
+  const response = await axios
+    .post(baseUrl + '/' + blogId + '/comment', { comment: comment }, config);
+
+  return response.data;
+}
+
 const remove = async (blog) => {
   const config = {
     headers: { Authorization: token }
@@ -62,4 +73,4 @@ const enrichWithPermissions = (blogs, user) => {
 
 export const getToken = () => token;
 
-export default { getAll, setToken, getToken, create, update, remove, enrichWithPermissions };
+export default { getAll, setToken, getToken, create, update, comment, remove, enrichWithPermissions };

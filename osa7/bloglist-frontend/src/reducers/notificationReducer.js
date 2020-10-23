@@ -3,6 +3,9 @@ export const notificationReducer = (state = null, action) => {
     case 'BLOG_LIKED':
       clearTimeoutOfPreviousNotification(state, action);
       return {notifId: action.notifId, notification: action.notificationText};
+    case 'BLOG_COMMENTED':
+      clearTimeoutOfPreviousNotification(state, action);
+      return {notifId: action.notifId, notification: action.notificationText};
     case 'BLOG_CREATED':
       clearTimeoutOfPreviousNotification(state, action);
       return {notifId: action.notifId, notification: action.notificationText};
