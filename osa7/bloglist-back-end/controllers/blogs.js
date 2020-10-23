@@ -36,7 +36,16 @@ notesRouter.get('/:id', async (request, response) => {
   }
 });
 
-
+notesRouter.post('/:id/comment', async (request, response) => {
+  try {
+    const blog = await Blog.findById(request.params.id);
+    blog.comments.push(request.body.comment);
+    await blog.save();
+    response.json(blog);
+  } catch (error) {
+    next(error);
+  }
+});
 
 notesRouter.post('/', async (request, response, next) => {
   const blog = request.body;
