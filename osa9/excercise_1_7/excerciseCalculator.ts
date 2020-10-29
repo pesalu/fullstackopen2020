@@ -37,7 +37,7 @@ const parseArguments = (args: Array<string>): InputValues => {
   };
 };
 
-const calculateExcercises = (
+export const calculateExcercises = (
   target: number,
   hours: number[]
 ): ExcerciseAnalysis => {
@@ -92,6 +92,7 @@ try {
     calculateExcercises(parsedArguments.target, parsedArguments.hours)
   );
 } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const message = String(error.message);
   console.log(`Something happened: ${message}`);
 }

@@ -51,6 +51,7 @@ try {
   const measures = parseArguments2(process.argv);
   console.log(bmiCalculator(measures.height, measures.mass));
 } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const message: string = error != null ? String(error.message) : "";
   console.log("ERROR with message ", message);
 }

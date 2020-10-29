@@ -1,7 +1,8 @@
 import express from "express";
 import { bmiCalculator } from "./bmiCalculator";
-
+import { calculateExcercises } from "./excerciseCalculator";
 const app = express();
+app.use(express.json());
 
 app.get("/hello", (_req, res) => {
   res.send("Hello Full Stack!");
@@ -20,6 +21,12 @@ app.get("/bmi", (req, res) => {
   } else {
     res.status(400).json({ error: "malformatted parameters" });
   }
+});
+
+app.post("/exercise", (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { target, hours } = req.body;
+  res.send(calculateExcercises(target, hours));
 });
 
 const PORT = 3000;
