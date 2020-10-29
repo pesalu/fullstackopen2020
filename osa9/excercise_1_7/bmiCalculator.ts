@@ -10,7 +10,7 @@ type Category =
   | "No description";
 
 export const bmiCalculator = (height: number, mass: number): Category => {
-  let result = mass / (height * 0.01) ** 2;
+  const result = mass / (height * 0.01) ** 2;
   if (result <= 15) {
     return "Very severely underweight";
   } else if (result >= 15 && result <= 16) {
@@ -48,8 +48,9 @@ const parseArguments2 = (args: string[]): inputValues => {
 };
 
 try {
-  let measures = parseArguments2(process.argv);
+  const measures = parseArguments2(process.argv);
   console.log(bmiCalculator(measures.height, measures.mass));
 } catch (error) {
-  console.log("ERROR with message ", error.message);
+  const message: string = error != null ? String(error.message) : "";
+  console.log("ERROR with message ", message);
 }

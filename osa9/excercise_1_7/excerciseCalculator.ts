@@ -11,18 +11,16 @@ interface ExcerciseAnalysis {
 type ratingDescription = "Excellent" | "Good" | "OK" | "Out of expression";
 
 interface InputValues {
-  target?: number;
-  hours?: number[];
-  mass?: number;
-  height?: number;
+  target: number;
+  hours: number[];
 }
 
 const parseArguments = (args: Array<string>): InputValues => {
-  let target: number;
-  let hours: number[] = [];
+  let target = 0;
+  const hours: number[] = [];
 
   for (let i = 2; i < args.length; i++) {
-    let value = Number(args[i]);
+    const value = Number(args[i]);
 
     if (isNaN(value)) {
       throw new Error(`Given argument ${args[i]} not a number!`);
@@ -43,14 +41,13 @@ const calculateExcercises = (
   target: number,
   hours: number[]
 ): ExcerciseAnalysis => {
-  let sumAverage: number =
+  const sumAverage: number =
     hours.length > 0
       ? hours.reduce((sum, hour) => sum + hour, 0) / hours.length
       : 0;
 
-  let rating = getRating(target, sumAverage);
-
-  let ratingDescription = getRatingDescription(rating);
+  const rating = getRating(target, sumAverage);
+  const ratingDescription = getRatingDescription(rating);
 
   return {
     periodLength: hours.length,
@@ -64,13 +61,15 @@ const calculateExcercises = (
 };
 
 const getRating = (target: number, sumAverage: number): number => {
-  let diff: number = sumAverage - target;
+  const diff: number = sumAverage - target;
   if (diff > 1) {
     return 3;
   } else if (diff >= 0 && diff <= 1) {
     return 2;
   } else if (diff < 0) {
     return 1;
+  } else {
+    return 0;
   }
 };
 
@@ -93,5 +92,6 @@ try {
     calculateExcercises(parsedArguments.target, parsedArguments.hours)
   );
 } catch (error) {
-  console.log(`Something happened: ${error.message}`);
+  const message = String(error.message);
+  console.log(`Something happened: ${message}`);
 }
