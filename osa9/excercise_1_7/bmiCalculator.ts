@@ -6,9 +6,10 @@ type Category =
   | "Overweight"
   | "Obese Class I (Moderately obese)"
   | "Obese Class II (Severely obese)"
-  | "Obese Class III (Very severely obese)";
+  | "Obese Class III (Very severely obese)"
+  | "No description";
 
-const bmiCalculator = (height: number, mass: number): Category => {
+export const bmiCalculator = (height: number, mass: number): Category => {
   let result = mass / (height * 0.01) ** 2;
   if (result <= 15) {
     return "Very severely underweight";
@@ -26,6 +27,8 @@ const bmiCalculator = (height: number, mass: number): Category => {
     return "Obese Class II (Severely obese)";
   } else if (result >= 40) {
     return "Obese Class III (Very severely obese)";
+  } else {
+    return "No description";
   }
 };
 
@@ -33,9 +36,6 @@ interface inputValues {
   height: number;
   mass: number;
 }
-
-const height: number = Number(process.argv[2]);
-const mass: number = Number(process.argv[3]);
 
 const parseArguments2 = (args: string[]): inputValues => {
   if (isNaN(Number(args[2])) || isNaN(Number(args[3]))) {
