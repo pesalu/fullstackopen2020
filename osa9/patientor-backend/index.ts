@@ -12,7 +12,7 @@ const PORT = 3001;
 const root = "/api";
 
 app.get(`${root}/ping`, (_req, res) => {
-  res.send("PING");
+  res.send("PING!");
 });
 
 app.listen(PORT, () => {
