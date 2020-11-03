@@ -1,17 +1,21 @@
 import React from "react";
-import { Course } from "../types";
+import { CoursePart } from "../types";
+import { Part } from "../components/Part";
 
-export const Content: React.FC<{ courses: Course[] }> = ({ courses }) => {
+export const Content: React.FC<{ courses: CoursePart[] }> = ({ courses }) => {
   return (
     <>
       {courses.map((course) => (
-        <CourseCom key={course.name} course={course} />
+        <>
+          <Part key={course.name} coursePart={course} />
+          <br />
+        </>
       ))}
     </>
   );
 };
 
-export const CourseCom: React.FC<{ course: Course }> = ({ course }) => {
+export const CourseCom: React.FC<{ course: CoursePart }> = ({ course }) => {
   return (
     <p>
       {course.name} {course.exerciseCount}
