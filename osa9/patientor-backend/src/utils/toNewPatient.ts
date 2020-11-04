@@ -4,6 +4,7 @@ import { NewPatient } from "../types/NewPatient";
 import { isDate, isGender, isString } from "../utils/typeGuards";
 
 // eslint-disable @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const toNewPatient = (object: any): NewPatient => {
   return {
     name: parseText(object.name),

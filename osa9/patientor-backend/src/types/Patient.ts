@@ -3,7 +3,7 @@ import { Gender } from "./Gender";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Entry {}
 
-export default interface Patient {
+export interface Patient {
   id: string;
   name: string;
   dateOfBirth: string;

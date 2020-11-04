@@ -1,5 +1,5 @@
 import patients from "./data/patients";
-import Patient, { PublicPatient } from "../types/Patient";
+import { PublicPatient, Patient } from "../types/Patient";
 import { PatientNoSSN } from "../types/PatientNoSSN";
 import { NewPatient } from "../types/NewPatient";
 import { parseText } from "../utils/parsers";
