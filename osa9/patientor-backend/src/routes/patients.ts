@@ -17,6 +17,7 @@ patientRouter.get("/:id", (req, res) => {
   try {
     res.json(getPatientById(req.params.id));
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     res.status(400).json({ error: error.message });
   }
 });
