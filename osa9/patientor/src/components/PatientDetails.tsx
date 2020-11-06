@@ -1,24 +1,21 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header, Icon } from "semantic-ui-react";
-import { useStateValue } from "../state";
+import { apiBaseUrl } from "../constants";
+import { setPatientDetails, useStateValue } from "../state";
+import { Entry, PatientDetails } from "../types";
 
-type TParams = {
-  id: string;
-};
-
-const PatientDetails: React.FC = () => {
-  const [{ patients }] = useStateValue();
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // const match = useRouteMatch("/patients/:id") as any;
-
-  // const id = match && match.params ? match.params.id : null;
+const PatientDetailsView: React.FC = () => {
+  const [{ patient }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
-  const patient = patients[id];
+  useEffect(() => {
+    axios.get<PatientDetails>(`${apiBaseUrl}/patients/${id}`).then((result) => {
+      dispatch(setPatientDetails(result.data));
+    });
+  }, [dispatch, id]);
 
-  console.log("PATS ", patients);
   if (!patient) {
     return (
       <>
@@ -49,8 +46,57 @@ const PatientDetails: React.FC = () => {
           <strong>Occupation</strong> {patient.gender}
         </span>
       </div>
+
+      <Header>Entries</Header>
+      <div>
+        {patient.entries.map((entry) => (
+          <div key={entry.id}>
+            <EntryView entry={entry} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default PatientDetails;
+const EntryView: React.FC<{ entry: Entry }> = ({ entry }) => {
+  switch (entry.type) {
+    case "HealthCheck":
+      return (
+        <>
+          <p>
+            {entry.date} {entry.description}
+          </p>
+          <ul>
+            {entry.diagnosisCodes
+              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              : null}
+          </ul>
+        </>
+      );
+    case "Hospital":
+      return (
+        <>
+          {entry.date} {entry.description}
+          <ul>
+            {entry.diagnosisCodes
+              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              : null}
+          </ul>
+        </>
+      );
+    case "OccupationalHealthcare":
+      return (
+        <>
+          {entry.date} {entry.description}
+          <ul>
+            {entry.diagnosisCodes
+              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              : null}
+          </ul>
+        </>
+      );
+  }
+};
+
+export default PatientDetailsView;
