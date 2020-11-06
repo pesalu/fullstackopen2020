@@ -4,10 +4,10 @@ import { useParams } from "react-router-dom";
 import { Header, Icon } from "semantic-ui-react";
 import { apiBaseUrl } from "../constants";
 import { setPatientDetails, useStateValue } from "../state";
-import { Entry, PatientDetails } from "../types";
+import { Diagnosis, Entry, PatientDetails } from "../types";
 
 const PatientDetailsView: React.FC = () => {
-  const [{ patient }, dispatch] = useStateValue();
+  const [{ diagnoses, patient }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const PatientDetailsView: React.FC = () => {
       <div>
         {patient.entries.map((entry) => (
           <div key={entry.id}>
-            <EntryView entry={entry} />
+            <EntryView entry={entry} diagnoses={diagnoses} />
           </div>
         ))}
       </div>
@@ -59,7 +59,12 @@ const PatientDetailsView: React.FC = () => {
   );
 };
 
-const EntryView: React.FC<{ entry: Entry }> = ({ entry }) => {
+const EntryView: React.FC<{
+  entry: Entry;
+  diagnoses: {
+    [code: string]: Diagnosis;
+  };
+}> = ({ entry, diagnoses }) => {
   switch (entry.type) {
     case "HealthCheck":
       return (
@@ -69,7 +74,11 @@ const EntryView: React.FC<{ entry: Entry }> = ({ entry }) => {
           </p>
           <ul>
             {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              ? entry.diagnosisCodes.map((code) => (
+                  <li key={code}>
+                    {code} {diagnoses[code] && diagnoses[code].name}
+                  </li>
+                ))
               : null}
           </ul>
         </>
@@ -80,7 +89,11 @@ const EntryView: React.FC<{ entry: Entry }> = ({ entry }) => {
           {entry.date} {entry.description}
           <ul>
             {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              ? entry.diagnosisCodes.map((code) => (
+                  <li key={code}>
+                    {code} {diagnoses[code] && diagnoses[code].name}
+                  </li>
+                ))
               : null}
           </ul>
         </>
@@ -91,7 +104,11 @@ const EntryView: React.FC<{ entry: Entry }> = ({ entry }) => {
           {entry.date} {entry.description}
           <ul>
             {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)
+              ? entry.diagnosisCodes.map((code) => (
+                  <li key={code}>
+                    {code} {diagnoses[code] && diagnoses[code].name}
+                  </li>
+                ))
               : null}
           </ul>
         </>
