@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Header, Icon } from "semantic-ui-react";
+import { Card, CardGroup, Header, Icon } from "semantic-ui-react";
 import { apiBaseUrl } from "../constants";
 import { setPatientDetails, useStateValue } from "../state";
-import { Diagnosis, Entry, PatientDetails } from "../types";
+import { Diagnosis, Entry, HealthCheckRating, PatientDetails } from "../types";
 
 const PatientDetailsView: React.FC = () => {
   const [{ diagnoses, patient }, dispatch] = useStateValue();
@@ -27,7 +27,7 @@ const PatientDetailsView: React.FC = () => {
   return (
     <div>
       <Header>
-        {patient.name}{" "}
+        {patient.name}
         {patient.gender ? (
           patient.gender === "male" ? (
             <Icon name="mars" />
@@ -38,7 +38,7 @@ const PatientDetailsView: React.FC = () => {
       </Header>
       <div>
         <span>
-          <strong>SSN</strong> 1222{patient.ssn}
+          <strong>SSN</strong> {patient.ssn}
         </span>
       </div>
       <div>
@@ -48,14 +48,37 @@ const PatientDetailsView: React.FC = () => {
       </div>
 
       <Header>Entries</Header>
-      <div>
+      <CardGroup itemsPerRow={1}>
         {patient.entries.map((entry) => (
-          <div key={entry.id}>
-            <EntryView entry={entry} diagnoses={diagnoses} />
-          </div>
+          <EntryView key={entry.id} entry={entry} diagnoses={diagnoses} />
         ))}
-      </div>
+      </CardGroup>
     </div>
+  );
+};
+
+const DiagnosesList: React.FC<{
+  givenDiagnoses: string[];
+  diagnoses: {
+    [code: string]: Diagnosis;
+  };
+}> = ({ givenDiagnoses, diagnoses }) => {
+  return (
+    <ul>
+      {givenDiagnoses
+        ? givenDiagnoses.map((code) => (
+            <li key={code}>
+              {code} {diagnoses[code] && diagnoses[code].name}
+            </li>
+          ))
+        : null}
+    </ul>
+  );
+};
+
+const assertNever = (value: never): never => {
+  throw new Error(
+    `Unhandled discriminated union member ${JSON.stringify(value)}`
   );
 };
 
@@ -67,52 +90,106 @@ const EntryView: React.FC<{
 }> = ({ entry, diagnoses }) => {
   switch (entry.type) {
     case "HealthCheck":
-      return (
-        <>
-          <p>
-            {entry.date} {entry.description}
-          </p>
-          <ul>
-            {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => (
-                  <li key={code}>
-                    {code} {diagnoses[code] && diagnoses[code].name}
-                  </li>
-                ))
-              : null}
-          </ul>
-        </>
-      );
+      return <HealthCheckEntryView entry={entry} diagnoses={diagnoses} />;
     case "Hospital":
-      return (
-        <>
-          {entry.date} {entry.description}
-          <ul>
-            {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => (
-                  <li key={code}>
-                    {code} {diagnoses[code] && diagnoses[code].name}
-                  </li>
-                ))
-              : null}
-          </ul>
-        </>
-      );
+      return <HospitalEntryView entry={entry} diagnoses={diagnoses} />;
     case "OccupationalHealthcare":
-      return (
-        <>
-          {entry.date} {entry.description}
-          <ul>
-            {entry.diagnosisCodes
-              ? entry.diagnosisCodes.map((code) => (
-                  <li key={code}>
-                    {code} {diagnoses[code] && diagnoses[code].name}
-                  </li>
-                ))
-              : null}
-          </ul>
-        </>
-      );
+      return <HealthCheckEntryView entry={entry} diagnoses={diagnoses} />;
+    default:
+      assertNever(entry);
+      return <></>;
+  }
+};
+
+export const HealthCheckEntryView: React.FC<{
+  entry: Entry;
+  diagnoses: {
+    [code: string]: Diagnosis;
+  };
+}> = ({ entry, diagnoses }) => {
+  return (
+    <Card>
+      <Card.Content>
+        <span>
+          <Card.Header>
+            {entry.date} <Icon name="user md"></Icon>
+          </Card.Header>
+        </span>
+        <Card.Meta>{entry.description}</Card.Meta>
+
+        {entry.diagnosisCodes && (
+          <DiagnosesList
+            givenDiagnoses={entry.diagnosisCodes ? entry.diagnosisCodes : []}
+            diagnoses={diagnoses}
+          />
+        )}
+
+        {entry.type === "HealthCheck" && (
+          <HealthCheckRatingView rating={entry.healthCheckRating} />
+        )}
+      </Card.Content>
+    </Card>
+  );
+};
+
+export const HospitalEntryView: React.FC<{
+  entry: Entry;
+  diagnoses: {
+    [code: string]: Diagnosis;
+  };
+}> = ({ entry, diagnoses }) => {
+  return (
+    <Card>
+      <Card.Content>
+        <span>
+          <Card.Header>
+            {entry.date} <Icon name="hospital"></Icon>
+          </Card.Header>
+        </span>
+        <Card.Meta>{entry.description}</Card.Meta>
+        <DiagnosesList
+          givenDiagnoses={entry.diagnosisCodes ? entry.diagnosisCodes : []}
+          diagnoses={diagnoses}
+        />
+      </Card.Content>
+    </Card>
+  );
+};
+
+export const OccupationalHealthcare: React.FC<{
+  entry: Entry;
+  diagnoses: {
+    [code: string]: Diagnosis;
+  };
+}> = ({ entry, diagnoses }) => {
+  return (
+    <Card>
+      <Card.Content>
+        <Card.Header>
+          {entry.date} <Icon name="stethoscope"></Icon>
+        </Card.Header>
+        <Card.Meta>{entry.description}</Card.Meta>
+        <DiagnosesList
+          givenDiagnoses={entry.diagnosisCodes ? entry.diagnosisCodes : []}
+          diagnoses={diagnoses}
+        />
+      </Card.Content>
+    </Card>
+  );
+};
+
+export const HealthCheckRatingView: React.FC<{ rating: HealthCheckRating }> = ({
+  rating,
+}) => {
+  switch (rating) {
+    case HealthCheckRating.Healthy:
+      return <Icon name="heart" color="green" />;
+    case HealthCheckRating.LowRisk:
+      return <Icon name="heart" color="yellow" />;
+    case HealthCheckRating.HighRisk:
+      return <Icon name="heart" color="red" />;
+    case HealthCheckRating.CriticalRisk:
+      return <Icon name="heart" color="black" />;
   }
 };
 
