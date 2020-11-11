@@ -81,6 +81,10 @@ const patients: Patient[] = [
         type: "OccupationalHealthcare",
         employerName: "FBI",
         description: "Prescriptions renewed.",
+        sickLeave: {
+          startDate: "2020-01-01",
+          endDate: "2020-01-10",
+        },
       },
       {
         id: "37be178f-a432-4ba4-aac2-f86810e36a15",

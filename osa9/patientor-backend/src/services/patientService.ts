@@ -3,7 +3,8 @@ import { PublicPatient, Patient } from "../types/Patient";
 import { PatientNoSSN } from "../types/PatientNoSSN";
 import { NewPatient } from "../types/NewPatient";
 import { parseText } from "../utils/parsers";
-
+import { NewEntry, Entry } from "../types/Entry";
+import { toNewEntry } from "../utils/toNewPatient";
 const patientsEntries: Array<Patient> = patients;
 
 export const getAllPatients = (): Array<PublicPatient> => {
@@ -31,6 +32,19 @@ export const getPatientById = (id: string): Patient => {
   const patient = patientsEntries.find((patient) => patient.id === id);
   if (patient && parseText(id)) {
     return patient;
+  } else {
+    throw new Error(`Patient by id ${id} not found!`);
+  }
+};
+
+export const createEntry = (id: string, entry: NewEntry): Entry => {
+  const patient = patientsEntries.find((patient) => patient.id === id);
+
+  if (patient && parseText(id)) {
+    const newEntry = toNewEntry(entry) as Entry;
+    newEntry.id = makeId();
+    patient.entries.push(newEntry);
+    return newEntry;
   } else {
     throw new Error(`Patient by id ${id} not found!`);
   }
