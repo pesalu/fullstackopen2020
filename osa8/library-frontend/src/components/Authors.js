@@ -1,18 +1,9 @@
-  
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 
-import { ALL_AUTHORS, UPDATE_BIRTHYEAR } from '../queries';
+import Select from 'react-select';
 
-// const ALL_AUTHORS = gql`
-// query {
-//   allAuthors {
-//     name 
-//     born
-//     bookCount
-//   }
-// }
-// `
+import { ALL_AUTHORS, UPDATE_BIRTHYEAR } from '../queries';
 
 const Authors = (props) => {
 
@@ -33,6 +24,14 @@ const Authors = (props) => {
   }
 
   const authors = result.data.allAuthors;
+
+  const options = 
+   authors.map(author => {
+     return {
+       value: author.name,
+      label: author.name
+    }
+    });
 
   const submit = async (event) => {
     event.preventDefault();
@@ -70,8 +69,12 @@ const Authors = (props) => {
       <form onSubmit={submit}>
         <div>
           <h3>Set birthyear</h3>
-          <div>Author: <input value={name}
-          onChange={({target}) => setName(target.value)}/></div>
+          <Select
+            defaultValue={name}
+            onChange={({value}) => { 
+              setName(value)}}
+            options={options}
+          />
           <div>
             birthyear: 
             <input type="number"
@@ -81,7 +84,8 @@ const Authors = (props) => {
           <button type='submit'>Update</button>
         </div>
       </form>
-
+      <div>
+      </div>
     </div>
   )
 }
