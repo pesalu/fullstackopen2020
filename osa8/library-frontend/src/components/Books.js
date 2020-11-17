@@ -16,6 +16,10 @@ const Books = (props) => {
 
   const result = useQuery(ALL_BOOKS)
 
+  if(result.loading) {
+    return <div>loading... </div>
+  }
+  
   if (!props.show) {
     return null
   }
