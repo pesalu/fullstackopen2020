@@ -58,8 +58,16 @@ const resolvers = {
   Query: {
     bookCount: async () => { return Book.count({}) },
     authorCount: () => {return Author.count({})},
-    allBooks: (root, args) => {
-      return Book.find({});
+    allBooks: async (root, args) => {
+      let searchFilters = {};
+      if (args.genre) {
+        searchFilters.genres = {$in: [args.genre]};
+      }
+      if (args.author) {
+        let author = await Author.findOne({name: args.author});
+        searchFilters.author = {$in: [author.id]};
+      }
+      return Book.find(searchFilters);
     },
     allAuthors: () => {
       return Author.find({});
@@ -68,7 +76,6 @@ const resolvers = {
   Mutation: {
     addBook: async (root, args) => {
       try {
-        console.log('ARFGS ', args)
         let newBook;
         let authorExist = await Author.exists({name: args.author});
         let bookExist = await Book.exists({name: args.title});
@@ -90,20 +97,18 @@ const resolvers = {
             author: newAuthor
           });
         }
-        console.log('BOOK NEW ', newBook)
         return await newBook.save();
       } catch (error) {
-        console.log('HERE 3')
         throw new UserInputError(error.message, {
           invalidArgs: args,
         })
       }
     },
-    editAuthor: (root, args) => {
-      let author = authors.find(author => author.name === args.name);
+    editAuthor: async (root, args) => {
+      let author = await Author.findOne({name: args.name});
       if (author) {
         author.born = args.born;
-        return author;
+        return await author.save();
       } else {
         return null;
       }
