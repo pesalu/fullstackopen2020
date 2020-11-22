@@ -12,7 +12,9 @@ const CREATE_BOOK = gql`
       genres: $genres
     ) {
       title
-      author
+      author {
+        name
+      }
     }
   }
 `
@@ -22,7 +24,8 @@ const NewBook = (props) => {
   const [author, setAuhtor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
-  const [genres, setGenres] = useState([])
+  const [genres, setGenres] = useState([]);
+  const [notification, setNotification] = useState('');
 
   const [ createBook ] = useMutation(CREATE_BOOK,
     {refetchQueries: [ { query: ALL_BOOKS }, {query: ALL_AUTHORS} ]});
@@ -36,10 +39,25 @@ const NewBook = (props) => {
 
     console.log('add book...')
     let publishedVal = parseInt(published);
-    createBook({ variables: {
-      title, published: publishedVal,
-      author, genres
-     }});
+    try {
+      await createBook({ variables: {
+        title, published: publishedVal,
+        author, genres
+       }});
+    } catch (error) {
+      let message;
+      if (error.message.includes('Book validation')) {
+        message = `Invalid book data: ${error.message}`;
+      } else if (error.message.includes('Author validation')) {
+        message = `Invalid author data: ${error.message}`;
+      } else {
+        message = error.message;
+      }
+      setNotification(message);
+      setTimeout(() => {
+        setNotification('');
+      }, 5000);
+    }
 
     setTitle('')
     setPublished('')
@@ -55,6 +73,10 @@ const NewBook = (props) => {
 
   return (
     <div>
+      { 
+        notification && 
+        <div>{notification}</div> 
+      }
       <form onSubmit={submit}>
         <div>
           title

@@ -28,7 +28,7 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     genres: [String!]!
     id: ID!
   }
@@ -67,7 +67,7 @@ const resolvers = {
         let author = await Author.findOne({name: args.author});
         searchFilters.author = {$in: [author.id]};
       }
-      return Book.find(searchFilters);
+      return Book.find(searchFilters).populate('author', { name: 1});
     },
     allAuthors: () => {
       return Author.find({});
@@ -78,10 +78,6 @@ const resolvers = {
       try {
         let newBook;
         let authorExist = await Author.exists({name: args.author});
-        let bookExist = await Book.exists({name: args.title});
-        if (bookExist) {
-          throw new UserInputError(`Book ${args.title} exist!`);
-        }
 
         if(authorExist) {
           let author = await Author.findOne({name: args.author});
@@ -97,11 +93,12 @@ const resolvers = {
             author: newAuthor
           });
         }
+
         return await newBook.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
-        })
+        });
       }
     },
     editAuthor: async (root, args) => {
