@@ -1,24 +1,23 @@
 import React, {useState} from 'react'
 import { useQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../queries';
+import { ALL_BOOKS, CURRENT_USER } from '../queries';
 
 const Books = (props) => {
-
-  let [genre, setGenre] = useState(null);
 
   const result = useQuery(ALL_BOOKS)
 
   if(result.loading) {
     return <div>loading... </div>
   }
-  
+
   if (!props.show) {
     return null
   }
 
   const books = result.data.allBooks;
 
-  const filteredBooks = genre && genre !== 'all genres' ? books.filter(book => book.genres.includes(genre)) : books;
+  let userFavoriteGenre = localStorage['library-user-favorite-genre'];
+  const recommendedBooks = userFavoriteGenre && userFavoriteGenre !== 'all genres' ? books.filter(book => book.genres.includes(userFavoriteGenre)) : [];
 
   const genres = new Set(); 
   books.forEach(book => {
@@ -27,10 +26,11 @@ const Books = (props) => {
     )
   });
   const genresA = [...genres];
-
   return (
     <div>
-      <h2>books</h2>
+      <h2>Recommendations</h2>
+
+      <p>Books in your favorite genre <strong>{userFavoriteGenre}</strong></p>
 
       <table>
         <tbody>
@@ -45,7 +45,7 @@ const Books = (props) => {
               published
             </th>
           </tr>
-          {filteredBooks.map(a =>
+          {recommendedBooks.map(a =>
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author != null ? a.author.name : null}</td>
@@ -54,12 +54,6 @@ const Books = (props) => {
           )}
         </tbody>
       </table>
-
-      <div>
-          {genresA.map(genre => 
-            <button key={genre} onClick={() => setGenre(genre)}>{genre}</button>)}
-          <button onClick={() => setGenre('all genres')}>All genres</button>
-      </div>
     </div>
   )
 }

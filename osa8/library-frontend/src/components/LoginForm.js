@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {useMutation} from '@apollo/client';
-import {LOGIN} from '../queries';
+import {useMutation, useQuery} from '@apollo/client';
+import {LOGIN, CURRENT_USER} from '../queries';
 
 const LoginForm = ({setError, setToken, show}) => {
   const [username, setUsername] = useState('');
@@ -15,13 +15,19 @@ const LoginForm = ({setError, setToken, show}) => {
     }
   });
 
+  const resultCurrentUser = useQuery(CURRENT_USER);
+
   useEffect(() => {
     if(result.data) {
       const token = result.data.login.value;
       setToken(token);
       localStorage.setItem('library-user-token', token);
     }
-  }, [result.data]); // eslint-disable-line
+    if (resultCurrentUser && resultCurrentUser.data) {
+      let favoriteGenre = resultCurrentUser.data.me ? resultCurrentUser.data.me.favoriteGenre : null;
+      localStorage.setItem('library-user-favorite-genre', favoriteGenre);
+    }
+  }, [result.data, resultCurrentUser.data]); // eslint-disable-line
 
   const submit = async (event) => {
     event.preventDefault();
