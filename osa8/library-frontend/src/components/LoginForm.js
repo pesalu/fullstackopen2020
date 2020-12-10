@@ -20,7 +20,6 @@ const LoginForm = ({setError, setToken, show}) => {
     let favoriteGenre = resultCurrentUser.data.me ? resultCurrentUser.data.me.favoriteGenre : null;
     localStorage.setItem('library-user-favorite-genre', favoriteGenre);
   }
-  console.log(resultCurrentUser)
 
   useEffect(() => {
     if(result.data) {

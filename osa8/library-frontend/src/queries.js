@@ -3,8 +3,10 @@ import { gql } from '@apollo/client'
 export const ALL_BOOKS = gql`
 query {
   allBooks { 
+    id
     title 
     author {
+      id
       name
     }
     published 
@@ -16,6 +18,7 @@ query {
 export const ALL_AUTHORS = gql`
 query {
   allAuthors {
+    id
     name
     born
     bookCount
@@ -42,6 +45,7 @@ mutation createBook($title: String!, $author: String!, $published: Int!, $genres
     published: $published,
     genres: $genres
   ) {
+    id
     title
     author
   }
@@ -50,9 +54,12 @@ mutation createBook($title: String!, $author: String!, $published: Int!, $genres
 
 const BOOK_DETAILS = gql`
   fragment BookDetails on Book {
+    id
     title 
     author {
+      id
       name
+      born 
     }
     published 
     genres
