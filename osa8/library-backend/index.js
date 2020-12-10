@@ -6,7 +6,8 @@ const Author = require('./models/author');
 const Book = require('./models/book');
 const User = require('./models/user');
 
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const author = require('./models/author');
 const JWT_SECRET = 'SALAISUUS';
 
 const MONGODB_URI = 'mongodb+srv://mongoman:m0ng0m4n@cluster0-yjapj.mongodb.net/graphql-app?retryWrites=true&w=majority'
@@ -27,6 +28,7 @@ const typeDefs = gql`
     name: String!
     id: String!
     born: Int
+    books: [Book!]!
     bookCount: Int
   }
 
@@ -43,7 +45,7 @@ const typeDefs = gql`
     favoriteGenre: String!
     id: ID!
   }
-  
+
   type Token {
     value: String!
   }
@@ -100,33 +102,46 @@ const resolvers = {
       }
       return Book.find(searchFilters).populate('author', { name: 1});
     },
-    allAuthors: () => {
-      return Author.find({});
+    allAuthors: async (root, args, context, info) => {
+      if (
+        info.fieldNodes[0].selectionSet.selections.find(selection => selection.name.value === 'books') ||
+        info.fieldNodes[0].selectionSet.selections.find(selection => selection.name.value === 'bookCount')) {
+        authors = await Author.find({}).populate('books');
+        authors.forEach(author => author.bookCount = author.books.length);
+      } else {
+        authors = await Author.find({})
+      }
+      return authors;
     }
   },
   Mutation: {
     addBook: async (root, args, context) => {
       getCurrentUser(context);
 
+      let author;
       try {
         let newBook;
         let authorExist = await Author.exists({name: args.author});
 
         if(authorExist) {
-          let author = await Author.findOne({name: args.author});
+          author = await Author.findOne({name: args.author});
           newBook = new Book({
             ...args,
             author
           });
         } else {
-          let newAuthor = new Author({ name: args.author });
-          await newAuthor.save();
+          author = new Author({ name: args.author });
+          author = await author.save();
           newBook = new Book({
             ...args,
-            author: newAuthor
+            author: author,
+            books: []
           });
         }
         let book = await newBook.save();
+
+        author.books = author.books.concat(book._id);
+        await author.save();
 
         pubsub.publish('BOOK_ADDED', {bookAdded: book})
         return book;
@@ -149,7 +164,7 @@ const resolvers = {
     },
     createUser: (root, args) => {
       const user = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
-  
+
       return user.save()
         .catch(error => {
           throw new UserInputError(error.message, {
@@ -159,16 +174,16 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
-  
+
       if ( !user || args.password !== 'secret' ) {
         throw new UserInputError("wrong credentials")
       }
-  
+
       const userForToken = {
         username: user.username,
         id: user._id,
       }
-  
+
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
   },
