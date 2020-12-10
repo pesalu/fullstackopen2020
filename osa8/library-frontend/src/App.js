@@ -54,8 +54,9 @@ const App = () => {
         </div>}
         <Authors
           show={page === 'authors'}
+          canEdit={!!token}
         />
-  
+
         <Books
           show={page === 'books'}
         />
@@ -69,7 +70,7 @@ const App = () => {
           !!token &&
           <NewBook show={page === 'add'} />
         }
-  
+
         <LoginForm setError={setError} setToken={setToken} show={page === 'login'}/>
 
       </div>);

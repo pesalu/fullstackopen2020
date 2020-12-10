@@ -41,7 +41,7 @@ const Authors = (props) => {
     setBirthyear(0);
     setName('');
   }
-
+  
   return (
     <div>
       <h2>authors</h2>
@@ -68,7 +68,7 @@ const Authors = (props) => {
         </tbody>
       </table>
 
-      <form onSubmit={submit}>
+{      props.canEdit && <form onSubmit={submit}>
         <div>
           <h3>Set birthyear</h3>
           <Select
@@ -85,7 +85,8 @@ const Authors = (props) => {
           </div>
           <button type='submit'>Update</button>
         </div>
-      </form>
+      </form>}
+
       <div>
       </div>
     </div>

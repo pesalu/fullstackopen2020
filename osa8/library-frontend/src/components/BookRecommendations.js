@@ -1,10 +1,11 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { useQuery } from '@apollo/client'
-import { ALL_BOOKS, CURRENT_USER } from '../queries';
+import { ALL_BOOKS } from '../queries';
 
-const Books = (props) => {
+const BookRecommendations = (props) => {
+  const userFavoriteGenre = localStorage.getItem('library-user-favorite-genre');
 
-  const result = useQuery(ALL_BOOKS)
+  const result = useQuery(ALL_BOOKS);
 
   if(result.loading) {
     return <div>loading... </div>
@@ -15,17 +16,14 @@ const Books = (props) => {
   }
 
   const books = result.data.allBooks;
-
-  let userFavoriteGenre = localStorage['library-user-favorite-genre'];
   const recommendedBooks = userFavoriteGenre && userFavoriteGenre !== 'all genres' ? books.filter(book => book.genres.includes(userFavoriteGenre)) : [];
 
-  const genres = new Set(); 
+  const genres = new Set();
   books.forEach(book => {
     book.genres.forEach(
       genre => genres.add(genre)
     )
   });
-  const genresA = [...genres];
   return (
     <div>
       <h2>Recommendations</h2>
@@ -58,4 +56,4 @@ const Books = (props) => {
   )
 }
 
-export default Books
+export default BookRecommendations;

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useMutation, useQuery} from '@apollo/client';
+import {useMutation, useQuery, useLazyQuery} from '@apollo/client';
 import {LOGIN, CURRENT_USER} from '../queries';
 
 const LoginForm = ({setError, setToken, show}) => {
@@ -15,17 +15,19 @@ const LoginForm = ({setError, setToken, show}) => {
     }
   });
 
-  const resultCurrentUser = useQuery(CURRENT_USER);
+  const [getCurrentUser, resultCurrentUser] = useLazyQuery(CURRENT_USER);
+  if (!resultCurrentUser.loading && resultCurrentUser.data) {
+    let favoriteGenre = resultCurrentUser.data.me ? resultCurrentUser.data.me.favoriteGenre : null;
+    localStorage.setItem('library-user-favorite-genre', favoriteGenre);
+  }
+  console.log(resultCurrentUser)
 
   useEffect(() => {
     if(result.data) {
       const token = result.data.login.value;
       setToken(token);
       localStorage.setItem('library-user-token', token);
-    }
-    if (resultCurrentUser && resultCurrentUser.data) {
-      let favoriteGenre = resultCurrentUser.data.me ? resultCurrentUser.data.me.favoriteGenre : null;
-      localStorage.setItem('library-user-favorite-genre', favoriteGenre);
+      getCurrentUser();
     }
   }, [result.data, resultCurrentUser.data]); // eslint-disable-line
 
