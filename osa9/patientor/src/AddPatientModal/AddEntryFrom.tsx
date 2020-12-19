@@ -44,7 +44,20 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit }) => {
       onSubmit={onSubmit}
       validate={(values) => {
         const requiredError = "Field is required";
+        const invalidDate = "invalid date";
         const errors: { [field: string]: string } = {};
+        if (!values.date) {
+          errors.date = requiredError;
+        } else if (values.date !== null) {
+          // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
+          const match = values.date.match(
+            /^\d{4}[\/\-](0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])$/
+          );
+          if (!match) {
+            errors.date = invalidDate;
+          }
+        }
+
         if (!values.type) {
           errors.type = requiredError;
         }

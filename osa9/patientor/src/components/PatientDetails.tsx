@@ -40,7 +40,8 @@ const PatientDetailsView: React.FC = () => {
       dispatch(updatePatientEntries(newEntry));
       closeModal();
     } catch (e) {
-      console.error(e.response.data);
+      console.error(e.response.data.error);
+      setError(e.response.data.error);
     }
   };
 
