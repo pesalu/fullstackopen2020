@@ -25,7 +25,6 @@ patientRouter.get("/:id", (req, res) => {
 
 patientRouter.post("/:id/entries", (req, res) => {
   try {
-    // res.json(createEntry(req.params.id));
     res.json(createEntry(req.params.id, req.body));
   } catch (error) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
