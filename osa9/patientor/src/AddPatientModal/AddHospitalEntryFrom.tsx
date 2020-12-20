@@ -3,50 +3,67 @@ import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 import { useStateValue } from "../state";
 
-import { TextField, NumberField, DiagnosisSelection } from "./FormField";
-import { HealthCheckEntry, HospitalEntry } from "../types";
+import { TextField, DiagnosisSelection } from "./FormField";
+import { HospitalEntry } from "../types";
 
 /*
  * use type Entry, but omit id,
  * because those are irrelevant for new entry object.
  */
-export type EntryFormValues =
-  | Omit<HealthCheckEntry, "id">
-  | Omit<HospitalEntry, "id">;
+export type EntryFormValues = Omit<HospitalEntry, "id">;
+
 interface Props {
-  entryType: string;
   onSubmit: (values: EntryFormValues) => void;
   onCancel: () => void;
 }
 
-export const AddEntryForm: React.FC<Props> = ({ entryType, onSubmit }) => {
+export const AddEntryForm: React.FC<Props> = ({ onSubmit }) => {
   const [{ diagnoses }] = useStateValue();
+
+  function dateIsInvalid(date: string) {
+    if (!date) {
+      return "Field is required";
+    } else if (date !== null) {
+      // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
+      const match = date.match(
+        /^\d{4}[\/\-](0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])$/
+      );
+      if (!match) {
+        return "invalid date";
+      }
+    }
+
+    return null;
+  }
 
   return (
     <Formik
       initialValues={{
-        type: "HealthCheck",
+        type: "Hospital",
         description: "",
         date: "",
         specialist: "",
         diagnosisCodes: [],
-        healthCheckRating: 0,
+        discharge: {
+          date: "",
+          criteria: "",
+        },
       }}
       onSubmit={onSubmit}
       validate={(values) => {
         const requiredError = "Field is required";
-        const invalidDate = "invalid date";
-        const errors: { [field: string]: string } = {};
-        if (!values.date) {
-          errors.date = requiredError;
-        } else if (values.date !== null) {
-          // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
-          const match = values.date.match(
-            /^\d{4}[\/\-](0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])$/
-          );
-          if (!match) {
-            errors.date = invalidDate;
-          }
+        const errors: { [field: string]: string | any } = {};
+
+        if (dateIsInvalid(values.date)) {
+          errors.date = dateIsInvalid(values.date);
+        }
+
+        const discharge: any = values.discharge;
+        if (dateIsInvalid(discharge.date) || !discharge.criteria) {
+          errors.discharge = {
+            date: dateIsInvalid(discharge.date),
+            criteria: discharge.criteria ? null : requiredError,
+          };
         }
 
         if (!values.type) {
@@ -61,6 +78,7 @@ export const AddEntryForm: React.FC<Props> = ({ entryType, onSubmit }) => {
         if (!values.specialist) {
           errors.specialist = requiredError;
         }
+
         return errors;
       }}
     >
@@ -94,15 +112,18 @@ export const AddEntryForm: React.FC<Props> = ({ entryType, onSubmit }) => {
               component={TextField}
             />
 
-            {entryType === "HealthCheck" ? (
-              <Field
-                label="Health Check Rating"
-                name="healthCheckRating"
-                component={NumberField}
-                min={0}
-                max={3}
-              />
-            ) : null}
+            <Field
+              label="Discharge criteria"
+              placeholder="Give discharge criteria"
+              name="discharge.criteria"
+              component={TextField}
+            />
+            <Field
+              label="Discharge date"
+              placeholder="YYYY-MM-DD"
+              name="discharge.date"
+              component={TextField}
+            />
 
             <Grid>
               <Grid.Column floated="left" width={5}>
@@ -123,7 +144,7 @@ export const AddEntryForm: React.FC<Props> = ({ entryType, onSubmit }) => {
                   color="green"
                   disabled={!dirty || !isValid}
                 >
-                  Add Entry
+                  Add Entry 2 {dirty} {isValid}
                 </Button>
               </Grid.Column>
             </Grid>

@@ -31,12 +31,6 @@ const PatientDetailsView: React.FC = () => {
         `${apiBaseUrl}/patients/${id}/entries`,
         values
       );
-      values = {
-        type: "HealthCheck",
-        description: "",
-        date: "",
-        specialist: "",
-      };
       dispatch(updatePatientEntries(newEntry));
       closeModal();
     } catch (e) {

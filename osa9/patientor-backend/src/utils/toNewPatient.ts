@@ -77,12 +77,10 @@ const parseSickLeave = (sickLeave: any): sickLeave => {
 };
 
 const parseDischarge = (discharge: any): Discharge => {
-  if (
-    !discharge ||
-    !isDate(discharge.date) ||
-    !isString(discharge.description)
-  ) {
-    throw new Error(`Discharge data invalid for given value ${discharge}`);
+  if (!discharge || !isDate(discharge.date) || !isString(discharge.criteria)) {
+    throw new Error(
+      `Discharge data invalid for given value ${discharge.data} and ${discharge.criteria}`
+    );
   } else {
     return discharge as Discharge;
   }
@@ -151,7 +149,7 @@ const parseGender = (gender: any): Gender => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parseHealthCheckRating = (rating: any): HealthCheckRating => {
-  if (!rating || !isHealthCheckRating(rating)) {
+  if (rating === null || !isHealthCheckRating(rating)) {
     throw new Error(
       `Value ${rating as string} is invalid for health check rating. `
     );
